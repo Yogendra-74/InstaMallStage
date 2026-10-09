@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="InstaMall iOS Suite" verbose="1">
+
+    <listeners>
+        <listener class-name="com.instamall.listeners.TestListener"/>
+    </listeners>
+
+    <test name="Onboarding">
+        <classes>
+            <class name="com.instamall.tests.OnboardingTest"/>
+        </classes>
+    </test>
+
+    <test name="Login">
+        <classes>
+            <class name="com.instamall.tests.LoginTest"/>
+        </classes>
+    </test>
+
+    <!--
+        Everything below signs itself in (clearing app data first, or
+        checking the onboarding screen before logging in), so it can
+        follow the signed-out screen tests above in any order.
+    -->
+    <test name="Profile">
+        <classes>
+            <class name="com.instamall.tests.ProfileTest"/>
+        </classes>
+    </test>
+
+    <test name="ProfileDiscovery">
+        <classes>
+            <class name="com.instamall.tests.ProfileDiscoveryTest"/>
+        </classes>
+    </test>
+
+    <test name="ProfileDiscoveryPhase2">
+        <classes>
+            <class name="com.instamall.tests.ProfileDiscoveryPhase2Test"/>
+        </classes>
+    </test>
+
+    <test name="ProfileDiscoveryPhase3">
+        <classes>
+            <class name="com.instamall.tests.ProfileDiscoveryPhase3Test"/>
+        </classes>
+    </test>
+
+    <test name="WishlistToBag">
+        <classes>
+            <class name="com.instamall.tests.WishlistToBagTest"/>
+        </classes>
+    </test>
+
+    <!--
+        Runs last on purpose: it signs in, so it leaves the app with an
+        active session. The screen tests above expect the signed-out
+        onboarding screen on launch.
+    -->
+    <test name="EndToEnd">
+        <classes>
+            <class name="com.instamall.tests.EndToEndOrderTest"/>
+        </classes>
+    </test>
+
+    <test name="SearchAndPlaceOrder">
+        <classes>
+            <class name="com.instamall.tests.SearchAndPlaceOrderTest"/>
+        </classes>
+    </test>
+
+    <!--
+        A different app (the Shopper app, installed on the same
+        simulator) — unaffected by the Customer app session state left
+        above, since ShopperBaseTest relaunches by its own bundle id.
+    -->
+    <test name="ShopperLogin">
+        <classes>
+            <class name="com.instamall.tests.shopper.ShopperLoginTest"/>
+        </classes>
+    </test>
+
+    <test name="OrderConfirmationAndApproval">
+        <classes>
+            <class name="com.instamall.tests.shopper.OrderConfirmationAndApprovalTest"/>
+        </classes>
+    </test>
+
+</suite>

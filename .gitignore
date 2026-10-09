@@ -1,0 +1,6 @@
+target/
+test-output/
+.DS_Store
+*.class
+.idea/
+*.iml
