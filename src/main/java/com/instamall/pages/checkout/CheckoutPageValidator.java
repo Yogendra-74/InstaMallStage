@@ -61,21 +61,6 @@ public class CheckoutPageValidator extends BasePage {
                 && isDisplayed(CheckoutPageLocators.SCHEDULE_OPTION);
     }
 
-    public boolean isFarAwayWarningDisplayed() {
-
-        return isDisplayed(CheckoutPageLocators.FAR_AWAY_WARNING);
-    }
-
-    public boolean isContactDisplayed() {
-
-        return isDisplayed(CheckoutPageLocators.CONTACT_ROW);
-    }
-
-    public boolean isSummaryStoreRowDisplayed(String storeName) {
-
-        return isDisplayed(CheckoutPageLocators.summaryStoreRow(storeName));
-    }
-
     /**
      * Presence check only — these rows sit below the fold, so visibility
      * would be false until the summary is scrolled into view.
@@ -96,12 +81,6 @@ public class CheckoutPageValidator extends BasePage {
     public boolean isChargeRowPresent(String label) {
 
         return isPresent(CheckoutPageLocators.chargeLabel(label));
-    }
-
-    public boolean isReturnPolicyDisplayed() {
-
-        return isDisplayed(CheckoutPageLocators.RETURN_POLICY_LABEL)
-                && isDisplayed(CheckoutPageLocators.RETURN_POLICY_TEXT);
     }
 
 }

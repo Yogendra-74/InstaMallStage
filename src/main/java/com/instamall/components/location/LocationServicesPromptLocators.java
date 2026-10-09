@@ -28,17 +28,6 @@ public final class LocationServicesPromptLocators {
                             + " AND accessible == 1 AND visible == 1"
             );
 
-    public static final By MESSAGE =
-            AppiumBy.iOSNsPredicateString(
-                    "(name BEGINSWITH 'Please enable location permission' OR name CONTAINS 'GPS/location services')"
-                            + " AND accessible == 1 AND visible == 1"
-            );
-
-    public static final By OPEN_SETTINGS =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Open Settings' AND accessible == 1 AND visible == 1"
-            );
-
     /**
      * Opens the "Deliver to" address sheet — the same one the home
      * header chip opens.

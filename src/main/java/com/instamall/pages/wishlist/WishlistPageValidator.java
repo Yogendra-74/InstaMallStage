@@ -20,8 +20,4 @@ public class WishlistPageValidator extends BasePage {
         return isPresent(WishlistPageLocators.card(productName));
     }
 
-    public boolean isSavedCountDisplayed() {
-
-        return isDisplayed(WishlistPageLocators.SAVED_COUNT);
-    }
 }

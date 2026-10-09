@@ -221,40 +221,6 @@ public class ShoppingBagPage extends BasePage {
     }
 
     /**
-     * Removes one variant with its Remove button.
-     */
-    public ShoppingBagPage removeItem(String productName, String size) {
-
-        Row row = rowFor(productName, size)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "No bag row for \"" + productName + "\" in size " + size));
-
-        scrollIntoView(row.removeButton);
-        row.removeButton.click();
-
-        waitUntil(driver -> hasItem(productName, size) ? null : Boolean.TRUE);
-
-        return this;
-    }
-
-    public String getQuantity() {
-
-        return getText(ShoppingBagPageLocators.QUANTITY);
-    }
-
-    /**
-     * Taps the first "Review delivery &amp; checkout" on screen. Each
-     * store group carries its own, so a bag holding several stores
-     * should go through clickCheckoutFor instead.
-     */
-    public ShoppingBagPage clickCheckout() {
-
-        click(ShoppingBagPageLocators.CHECKOUT_BUTTON);
-
-        return this;
-    }
-
-    /**
      * Taps the checkout button of the store group holding one variant —
      * the first "Review delivery &amp; checkout" below its row.
      */

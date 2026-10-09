@@ -21,16 +21,6 @@ public class PortalOrderDetailsPage extends PortalBasePage {
         return getText(PortalOrderDetailsPageLocators.ORDER_SUMMARY_STATUS_BADGE);
     }
 
-    public String getPrimaryProvider() {
-
-        return getText(PortalOrderDetailsPageLocators.PRIMARY_PROVIDER_VALUE);
-    }
-
-    public String getTrackingNumber() {
-
-        return getText(PortalOrderDetailsPageLocators.TRACKING_NUMBER_VALUE);
-    }
-
     // ---------- Override Status ----------
 
     public PortalOrderDetailsPage openStatusDropdown() {

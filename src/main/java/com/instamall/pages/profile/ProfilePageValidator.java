@@ -13,11 +13,6 @@ public class ProfilePageValidator extends BasePage {
 
     // ---------- Header ----------
 
-    public boolean isUserNameDisplayed(String displayName) {
-
-        return isDisplayed(ProfilePageLocators.userName(displayName));
-    }
-
     public boolean isUserEmailDisplayed(String email) {
 
         return isDisplayed(ProfilePageLocators.userEmail(email));
@@ -61,11 +56,6 @@ public class ProfilePageValidator extends BasePage {
                 && isPresent(ProfilePageLocators.MENU_MANAGE_ADDRESSES)
                 && isPresent(ProfilePageLocators.MENU_HELP_SUPPORT)
                 && isPresent(ProfilePageLocators.MENU_ABOUT_LEGAL);
-    }
-
-    public boolean isMenuRowPresent(String title) {
-
-        return isPresent(ProfilePageLocators.menuRow(title));
     }
 
     // ---------- Logout confirmation ----------

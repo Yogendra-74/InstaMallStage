@@ -19,11 +19,6 @@ public class OrderDetailPageValidator extends BasePage {
         return isDisplayed(OrderDetailPageLocators.productTitle(productName));
     }
 
-    public boolean isGotItButtonDisplayed() {
-
-        return isDisplayed(OrderDetailPageLocators.GOT_IT_BUTTON);
-    }
-
     /**
      * No-wait check, for branching on whichever state the order is
      * already in (e.g. re-running against an order carried over from a
@@ -104,15 +99,6 @@ public class OrderDetailPageValidator extends BasePage {
         return isDisplayed(OrderDetailPageLocators.RECEIPT_SCREEN_TITLE);
     }
 
-    /**
-     * True once the Simulator's camera-less "Scan failed" alert is up —
-     * see {@link OrderDetailPage#waitForScanFailedAlert()}.
-     */
-    public boolean isScanFailedAlertDisplayed() {
-
-        return isDisplayed(OrderDetailPageLocators.SCAN_FAILED_TITLE);
-    }
-
     public boolean isStartHandoffSheetDisplayed() {
 
         return isDisplayed(OrderDetailPageLocators.START_HANDOFF_SHEET_TITLE);
@@ -125,8 +111,8 @@ public class OrderDetailPageValidator extends BasePage {
 
     /**
      * True once the Simulator's camera-less message is up on the handoff
-     * photo screen — same underlying gap as
-     * {@link #isScanFailedAlertDisplayed()}, see
+     * photo screen — same underlying gap as the receipt-capture "Scan
+     * failed" alert, see
      * OrderDetailPageLocators.CAMERA_NOT_AVAILABLE_MESSAGE's own doc
      * comment.
      */

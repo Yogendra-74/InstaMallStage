@@ -26,11 +26,6 @@ public class ProductDetailPageValidator extends BasePage {
         return isDisplayed(ProductDetailPageLocators.brand(brandName));
     }
 
-    public boolean isPriceDisplayed() {
-
-        return isDisplayed(ProductDetailPageLocators.PRICE);
-    }
-
     // Presence, not visibility: the size row sits under the fixed Add to
     // bag bar on products with a long title.
     public boolean isSizeCardDisplayed() {
@@ -60,22 +55,6 @@ public class ProductDetailPageValidator extends BasePage {
                 .size() > 1;
     }
 
-    public boolean isColorCardDisplayed() {
-
-        return isDisplayed(ProductDetailPageLocators.COLOR_CARD);
-    }
-
-    public boolean isSizeOptionDisplayed(String size) {
-
-        return isDisplayed(ProductDetailPageLocators.sizeOption(size))
-                || isDisplayed(ProductDetailPageLocators.sizeSheetOption(size));
-    }
-
-    public boolean isAddToBagDisplayed() {
-
-        return isDisplayed(ProductDetailPageLocators.ADD_TO_BAG);
-    }
-
     /**
      * True once the item is in the bag — Add to bag turns into a
      * "View bag (n)" button, or, from the compact sheet, the bag screen
@@ -85,30 +64,6 @@ public class ProductDetailPageValidator extends BasePage {
 
         return isDisplayed(ProductDetailPageLocators.VIEW_BAG)
                 || WaitUtils.isVisibleNow(ShoppingBagPageLocators.TITLE);
-    }
-
-    /**
-     * True before a size is picked on a product that genuinely has more
-     * than one to choose from.
-     */
-    public boolean isSelectSizePromptDisplayed() {
-
-        return isDisplayed(ProductDetailPageLocators.SELECT_SIZE_PROMPT);
-    }
-
-    /**
-     * True on a one-size product, where there is nothing to prompt a
-     * choice for — see {@link #isSelectSizePromptDisplayed()} for its
-     * counterpart on a product with real sizes to pick from.
-     */
-    public boolean isOneSizeNoteDisplayed() {
-
-        return isDisplayed(ProductDetailPageLocators.ONE_SIZE_NOTE);
-    }
-
-    public boolean isIndependentShoppingBadgeDisplayed() {
-
-        return isDisplayed(ProductDetailPageLocators.INDEPENDENT_SHOPPING_BADGE);
     }
 
 }

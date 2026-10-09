@@ -39,14 +39,4 @@ public class PortalLoginPage extends PortalBasePage {
         return this;
     }
 
-    public boolean isRecaptchaShowing() {
-
-        return isDisplayedNow(PortalLoginPageLocators.RECAPTCHA_CONTAINER);
-    }
-
-    public boolean isSuspiciousRecaptchaErrorShowing() {
-
-        return isDisplayedNow(PortalLoginPageLocators.SUSPICIOUS_RECAPTCHA_ERROR);
-    }
-
 }

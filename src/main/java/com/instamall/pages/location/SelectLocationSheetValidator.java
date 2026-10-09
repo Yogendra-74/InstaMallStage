@@ -26,9 +26,4 @@ public class SelectLocationSheetValidator extends BasePage {
         return isDisplayed(SelectLocationSheetLocators.savedAddress(addressName));
     }
 
-    public boolean isSavedAddressesSectionDisplayed() {
-
-        return isDisplayed(SelectLocationSheetLocators.SAVED_ADDRESSES_HEADER);
-    }
-
 }

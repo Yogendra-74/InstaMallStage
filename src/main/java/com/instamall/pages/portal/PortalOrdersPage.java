@@ -36,21 +36,6 @@ public class PortalOrdersPage extends PortalBasePage {
     }
 
     /**
-     * Searches the Active tab's box — confirmed live that this does NOT
-     * appear to index this app's own order number (e.g. "IM-48575"
-     * returned "No Records Found"); see PortalOrdersPageLocators' own doc
-     * comment. Prefer opening the single matching card directly when
-     * there is only one, over relying on this to find it by that number.
-     */
-    public PortalOrdersPage searchActiveOrders(String query) {
-
-        type(PortalOrdersPageLocators.ACTIVE_SEARCH_INPUT, query);
-        click(PortalOrdersPageLocators.SEARCH_BUTTON);
-
-        return this;
-    }
-
-    /**
      * All order ids currently listed in the History tab's table, in row
      * order (includes "-exception-N" suffixed rows for retried orders).
      */
@@ -85,11 +70,6 @@ public class PortalOrdersPage extends PortalBasePage {
         match.click();
 
         return this;
-    }
-
-    public boolean isNoRecordsFoundShowing() {
-
-        return isDisplayedNow(PortalOrdersPageLocators.NO_RECORDS_FOUND);
     }
 
     /**

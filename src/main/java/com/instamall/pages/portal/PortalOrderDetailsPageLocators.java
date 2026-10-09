@@ -30,25 +30,11 @@ public final class PortalOrderDetailsPageLocators {
     public static final By ORDER_ID_VALUE =
             By.xpath("//*[normalize-space(text())='Order ID']/following-sibling::*[1]");
 
-    public static final By GROUP_ID_VALUE =
-            By.xpath("//*[normalize-space(text())='Group ID']/following-sibling::*[1]");
-
     public static final By PRIMARY_PROVIDER_VALUE =
             By.xpath("//*[normalize-space(text())='Primary Provider']/following-sibling::*[1]");
 
     public static final By TRACKING_NUMBER_VALUE =
             By.xpath("//*[normalize-space(text())='Tracking Number']/following-sibling::*[1]");
-
-    // ---------- Timeline ----------
-
-    public static final By TIMELINE_HEADER =
-            By.xpath("//*[contains(text(), 'Timeline')]");
-
-    public static final By PICKUP_LOCATION_NAME =
-            By.xpath("//*[contains(text(), 'Pickup Location')]/ancestor::*[self::div][1]");
-
-    public static final By DROPOFF_CUSTOMER_NAME =
-            By.xpath("//*[contains(text(), 'Customer Name')]/ancestor::*[self::div][1]");
 
     // ---------- Override Status section ----------
     //
@@ -80,12 +66,6 @@ public final class PortalOrderDetailsPageLocators {
      */
     public static final By ORDER_STATUS_SEARCH_INPUT =
             By.cssSelector("ng-select[formcontrolname='selectedOrderStatus'] input");
-
-    public static By orderStatusOption(String statusName) {
-
-        return By.xpath("//div[contains(@class,'ng-option')][normalize-space(.)='"
-                + statusName + "']");
-    }
 
     /**
      * Any rendered option, matched case-insensitively and by substring

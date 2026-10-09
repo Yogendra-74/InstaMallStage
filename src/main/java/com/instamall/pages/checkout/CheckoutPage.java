@@ -78,28 +78,12 @@ public class CheckoutPage extends BasePage {
         return getText(CheckoutPageLocators.PLACE_ORDER_BUTTON);
     }
 
-    public CheckoutPage selectScheduledDelivery() {
-
-        click(CheckoutPageLocators.SCHEDULE_OPTION);
-
-        return this;
-    }
-
     // NOTE: no tip method. The chips ($5 … $20) sit below the fold, so
     // they report visible == false and a tap can never become clickable
     // without scrolling the summary into view first — and the app already
     // applies a $10 tip by default, so no flow needs to touch them. The
     // locators are kept in CheckoutPageLocators for when scrolling
     // support lands.
-
-    /**
-     * Delivery fee as advertised on the Priority option, read out of its
-     * label ("Priority $14.99 7:21am–7:38am").
-     */
-    public BigDecimal getPriorityFee() {
-
-        return CurrencyUtils.parse(getText(CheckoutPageLocators.PRIORITY_OPTION));
-    }
 
     /**
      * Every charge on the summary, in render order: subtotal, delivery,

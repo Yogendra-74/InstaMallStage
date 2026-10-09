@@ -36,9 +36,6 @@ public final class SearchPageLocators {
                     "type == 'XCUIElementTypeTextField' AND visible == 1"
             );
 
-    public static final By CLEAR_SEARCH =
-            AppiumBy.accessibilityId("Clear search");
-
     // ---------- Tabs ----------
 
     /**
@@ -50,9 +47,6 @@ public final class SearchPageLocators {
      * "search_scope_tab_0/1/2" instead (left to right), which is what
      * these match — the one stable, tappable identifier this row offers.
      */
-    public static final By MALLS_TAB =
-            AppiumBy.accessibilityId("search_scope_tab_0");
-
     public static final By STORES_TAB =
             AppiumBy.accessibilityId("search_scope_tab_1");
 
@@ -66,40 +60,7 @@ public final class SearchPageLocators {
                     "type == 'XCUIElementTypeStaticText' AND name == 'Explore' AND accessible == 1"
             );
 
-    public static final By STORES_NEAR_YOU_HEADER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Stores near you' AND accessible == 1"
-            );
-
     // ---------- Results ----------
-
-    /**
-     * A Stores-tab result row, addressed by its full text — "&lt;Store&gt;
-     * &lt;Mall&gt;", e.g. "Ema Savahl Couture Aventura Mall".
-     *
-     * CAUTION: the row's own accessible=true element is nested inside
-     * several accessible=false ancestor wrappers whose aggregated name
-     * ALSO contains this same text (they read out everything on screen —
-     * "Search Malls Stores Products &lt;Store&gt; &lt;Mall&gt; …"). A
-     * CONTAINS predicate resolves to the outermost wrapper (full-screen
-     * bounds) and taps nothing useful. This matches the exact row only.
-     */
-    /**
-     * CAUTION: the row's exact suffix after the store name is
-     * inconsistent between contexts — a "Stores near you" suggestion
-     * (before any query) read "Acne Studios Miami Design District Miami"
-     * (mall AND city), while an actual Stores-tab search result read
-     * "Ema Savahl Couture Aventura Mall" (mall only, no city). An exact
-     * match built from just the store and mall name can miss the former
-     * shape. {@link #storeResultContaining(String)} is the safer default;
-     * prefer this overload only once the exact current row text is known.
-     */
-    public static By storeResult(String storeName, String mallName) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "name == '" + storeName + " " + mallName + "' AND accessible == 1"
-        );
-    }
 
     /**
      * A Stores-tab result row by store name alone, without needing the

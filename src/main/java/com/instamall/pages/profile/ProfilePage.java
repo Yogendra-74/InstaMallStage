@@ -131,18 +131,6 @@ public class ProfilePage extends BasePage {
                 .getAttribute("name");
     }
 
-    public String getWishlistTileText() {
-
-        return waitForVisibility(ProfilePageLocators.STAT_WISHLIST)
-                .getAttribute("name");
-    }
-
-    public String getOrdersTileText() {
-
-        return waitForVisibility(ProfilePageLocators.STAT_ORDERS)
-                .getAttribute("name");
-    }
-
     public ProfilePage openOrders() {
 
         click(ProfilePageLocators.STAT_ORDERS);

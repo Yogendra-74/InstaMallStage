@@ -18,11 +18,4 @@ public class ManageAddressesPage extends BasePage {
         return this;
     }
 
-    public ManageAddressesPage openAddress(String label) {
-
-        click(ManageAddressesPageLocators.addressCard(label));
-
-        return this;
-    }
-
 }

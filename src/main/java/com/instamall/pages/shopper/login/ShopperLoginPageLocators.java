@@ -19,11 +19,6 @@ public final class ShopperLoginPageLocators {
                     "type == 'XCUIElementTypeStaticText' AND name == 'IM Shopper' AND accessible == 1"
             );
 
-    public static final By WELCOME_HEADLINE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Welcome' AND accessible == 1"
-            );
-
     /**
      * Both inputs carry no accessible name — only a placeholder ("Email
      * address" / "Password") — so they are matched by type. That is
@@ -47,12 +42,6 @@ public final class ShopperLoginPageLocators {
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeStaticText' AND name == 'Forgot password?' AND accessible == 1"
             );
-
-    public static final By BECOME_A_SHOPPER =
-            AppiumBy.accessibilityId("Become a Shopper");
-
-    public static final By CONTINUE_YOUR_APPLICATION =
-            AppiumBy.accessibilityId("Continue your application");
 
     // NOTE: the password field's show/hide eye is an unnamed, unlabelled
     // Other (same shape as the Customer app's) — cannot be targeted

@@ -9,7 +9,6 @@ import com.instamall.pages.location.SelectLocationSheet;
 import com.instamall.pages.location.SelectLocationSheetValidator;
 import com.instamall.pages.onboarding.OnboardingPageValidator;
 import com.instamall.pages.profile.AboutLegalPage;
-import com.instamall.pages.profile.AboutLegalPageLocators;
 import com.instamall.pages.profile.AboutLegalPageValidator;
 import com.instamall.pages.profile.AccountSettingsPage;
 import com.instamall.pages.profile.AccountSettingsPageValidator;

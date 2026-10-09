@@ -30,9 +30,4 @@ public class EditAccountPageValidator extends BasePage {
         return WaitUtils.isVisibleNow(EditAccountPageLocators.TITLE);
     }
 
-    public boolean isSaveDisplayed() {
-
-        return isDisplayed(EditAccountPageLocators.SAVE_BUTTON);
-    }
-
 }

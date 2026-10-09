@@ -31,16 +31,6 @@ public class HomePageValidator extends BasePage {
         return isDisplayed(HomePageLocators.SEARCH_INSTAMALL);
     }
 
-    public boolean isShopByCategoryDisplayed() {
-
-        return isDisplayed(HomePageLocators.SHOP_BY_CATEGORY);
-    }
-
-    public boolean isDeliveryPromiseBannerDisplayed() {
-
-        return isDisplayed(HomePageLocators.DELIVERY_PROMISE_BANNER);
-    }
-
     public boolean isSectionDisplayed(String title) {
 
         return isDisplayed(HomePageLocators.sectionHeader(title));
@@ -54,15 +44,6 @@ public class HomePageValidator extends BasePage {
     public boolean isLocationSelected(String locationName) {
 
         return isDisplayed(HomePageLocators.selectedLocation(locationName));
-    }
-
-    /**
-     * The bag tab renames itself to "&lt;n&gt; Bag" once the bag holds
-     * items, so this doubles as the badge assertion.
-     */
-    public boolean isBagTabShowingCount(int itemCount) {
-
-        return isDisplayed(HomePageLocators.tabBagWithCount(itemCount));
     }
 
     public boolean areAllTabsDisplayed() {

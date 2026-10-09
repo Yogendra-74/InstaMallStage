@@ -11,11 +11,4 @@ public class AccountSettingsPage extends BasePage {
         return this;
     }
 
-    public AccountSettingsPage openNotificationsAndAnalytics() {
-
-        click(AccountSettingsPageLocators.NOTIFICATIONS_ROW);
-
-        return this;
-    }
-
 }

@@ -23,19 +23,6 @@ public final class ProductDetailPageLocators {
     // The "BACK" link is gone; the header chevron is the way back.
     public static final By BACK_BUTTON = HeaderLocators.BACK_CHEVRON;
 
-    public static final By TRY_ON =
-            AppiumBy.accessibilityId("AI Try-On");
-
-    public static final By PRODUCT_DETAILS_SECTION =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'PRODUCT DETAILS' AND accessible == 1"
-            );
-
-    public static final By SIMILAR_ITEMS_SECTION =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'SIMILAR ITEMS' AND accessible == 1"
-            );
-
     /**
      * Headline price, e.g. "$750" — note the PDP prints no decimals while
      * the bag and checkout print "$750.00".
@@ -236,53 +223,5 @@ public final class ProductDetailPageLocators {
      * An accessibility id on the heart would replace all of this.
      */
     public static final By HEADER_CHILDREN = AppiumBy.xpath("./*");
-
-    // ---------- Size-selection helper text ----------
-
-    /**
-     * Shown under the size row before any size is picked: "Select a size
-     * to add this item to your bag."
-     */
-    public static final By SELECT_SIZE_PROMPT =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText'"
-                            + " AND name == 'Select a size to add this item to your bag.' AND accessible == 1"
-            );
-
-    /**
-     * Shown instead of {@link #SELECT_SIZE_PROMPT} on a genuinely
-     * one-size product: "One size. See product dimensions when
-     * supplied." — the size button is already the only option, so there
-     * is nothing to prompt a choice for.
-     */
-    public static final By ONE_SIZE_NOTE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText'"
-                            + " AND name == 'One size. See product dimensions when supplied.' AND accessible == 1"
-            );
-
-    // ---------- Independent Shopping Service ----------
-
-    /**
-     * Small badge near the image carousel — an internal literal name
-     * ("independent_shopping_badge"), not a real accessibility id, so
-     * matched by accessibilityId all the same.
-     */
-    public static final By INDEPENDENT_SHOPPING_BADGE =
-            AppiumBy.accessibilityId("independent_shopping_badge");
-
-    // ---------- Colour selection ----------
-
-    /**
-     * A colour swatch button, addressed by the colour name it carries
-     * (e.g. "Nude", "Pink") — same shape as {@link #sizeOption(String)}
-     * but for the colour row instead of the size row.
-     */
-    public static By colorOption(String colorName) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeButton' AND name == '" + colorName + "' AND accessible == 1"
-        );
-    }
 
 }

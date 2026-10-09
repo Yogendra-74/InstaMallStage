@@ -14,16 +14,6 @@ public class PaymentSheetValidator extends BasePage {
     }
 
     /**
-     * Same check on a caller's own deadline — used to decide quickly
-     * whether placing the order actually opened the sheet, rather than
-     * sitting through the full timeout before trying something else.
-     */
-    public boolean isDisplayedWithin(Duration timeout) {
-
-        return isDisplayed(PaymentSheetLocators.PAY_BUTTON, timeout);
-    }
-
-    /**
      * Open at this instant, without waiting — for racing the sheet
      * against the toast that says the delivery was refused.
      */
@@ -44,11 +34,6 @@ public class PaymentSheetValidator extends BasePage {
     public boolean isSavedCardDisplayed(String lastFourDigits) {
 
         return isDisplayed(PaymentSheetLocators.savedCard(lastFourDigits));
-    }
-
-    public boolean isNewCardOptionDisplayed() {
-
-        return isDisplayed(PaymentSheetLocators.NEW_CARD);
     }
 
 }

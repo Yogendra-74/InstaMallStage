@@ -1,17 +1,13 @@
 package com.instamall.tests;
 
 import com.instamall.base.BaseTest;
-// import com.instamall.components.delivery.DeliveryUnavailablePrompt;
 import com.instamall.components.location.LocationServicesPrompt;
 import com.instamall.components.permissions.SystemAlerts;
-// import com.instamall.components.referral.ReferralPrompt;
 import com.instamall.config.ConfigReader;
 import com.instamall.flows.CheckoutFlow;
 import com.instamall.driver.AppSession;
 import com.instamall.pages.bag.ShoppingBagPage;
 import com.instamall.pages.bag.ShoppingBagPageValidator;
-// import com.instamall.pages.checkout.CheckoutPage;
-// import com.instamall.pages.checkout.CheckoutPageValidator;
 import com.instamall.pages.home.HomePage;
 import com.instamall.pages.home.HomePageValidator;
 import com.instamall.pages.location.SelectLocationSheet;
@@ -21,10 +17,6 @@ import com.instamall.pages.login.EmailLoginPageValidator;
 import com.instamall.pages.login.LoginPage;
 import com.instamall.pages.onboarding.OnboardingPage;
 import com.instamall.pages.onboarding.OnboardingPageValidator;
-// import com.instamall.pages.orders.OrderConfirmationPage;
-// import com.instamall.pages.orders.OrderConfirmationPageValidator;
-// import com.instamall.pages.payment.PaymentSheet;
-// import com.instamall.pages.payment.PaymentSheetValidator;
 import com.instamall.pages.product.ProductDetailPage;
 import com.instamall.pages.product.ProductDetailPageValidator;
 import com.instamall.pages.store.StorePage;

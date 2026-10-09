@@ -33,34 +33,9 @@ public class SelectLocationSheet extends BasePage {
         return this;
     }
 
-    /**
-     * Picks any address row by part of its street line — for suggestions
-     * that have no saved label.
-     */
-    public SelectLocationSheet chooseAddressContaining(String addressFragment) {
-
-        click(SelectLocationSheetLocators.addressContaining(addressFragment));
-
-        return this;
-    }
-
     public SelectLocationSheet searchAddress(String query) {
 
         type(SelectLocationSheetLocators.SEARCH_ADDRESS_TEXTBOX, query);
-
-        return this;
-    }
-
-    public SelectLocationSheet setHome() {
-
-        click(SelectLocationSheetLocators.SET_HOME);
-
-        return this;
-    }
-
-    public SelectLocationSheet setWork() {
-
-        click(SelectLocationSheetLocators.SET_WORK);
 
         return this;
     }

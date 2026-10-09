@@ -92,15 +92,6 @@ public final class ShopperHomePageLocators {
             );
 
     /**
-     * A history order's card — same shape, prefixed "ORDER DELIVERED",
-     * "ORDER CANCELLED" or "ORDER REJECTED" instead.
-     */
-    public static final By ANY_HISTORY_ORDER_CARD =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeOther' AND name BEGINSWITH 'ORDER ' AND accessible == 1"
-            );
-
-    /**
      * What the Active tab shows once every one of this shopper's orders
      * has left it — confirmed live right after a single-item order's only
      * item was rejected, which cancels the order itself (see
@@ -144,33 +135,10 @@ public final class ShopperHomePageLocators {
 
     // ---------- Shift status ----------
 
-    public static final By SHIFT_STATUS_TOGGLE =
-            AppiumBy.accessibilityId("View shift status options");
-
-    /**
-     * Confirmed against a page source dump taken live: a shopper who logs
-     * in offline is asked this before the dashboard is usable at all —
-     * every element behind it, including {@link #ACTIVE_TAB}, reports
-     * visible == false for as long as it is up, which is what made a
-     * fresh login time out waiting for the dashboard with no indication
-     * why. Not a system alert — an XCUIElementTypeOther sheet the app
-     * itself renders, so SystemAlerts.grantAnyShowingNow() never touches
-     * it.
-     */
-    public static final By GO_ON_SHIFT_SHEET_TITLE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Go on shift?' AND accessible == 1"
-            );
-
     public static final By GO_ON_SHIFT_BUTTON =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeOther' AND name == 'Go on shift'"
                             + " AND accessible == 1 AND visible == 1"
-            );
-
-    public static final By SKIP_FOR_NOW_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeOther' AND name == 'Skip for now' AND accessible == 1"
             );
 
 }

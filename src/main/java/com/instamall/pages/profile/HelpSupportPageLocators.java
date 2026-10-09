@@ -17,10 +17,6 @@ public final class HelpSupportPageLocators {
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeStaticText' AND name == 'Help & support' AND accessible == 1");
 
-    public static final By SECTION_ORDERS_DELIVERY = section("Orders & delivery");
-
-    public static final By SECTION_RETURNS_REFUNDS = section("Returns & refunds");
-
     public static By section(String title) {
 
         return AppiumBy.iOSNsPredicateString(

@@ -375,13 +375,6 @@ public class ProductDetailPage extends BasePage {
         return this;
     }
 
-    public ProductDetailPage chooseColor(String colorName) {
-
-        click(ProductDetailPageLocators.colorOption(colorName));
-
-        return this;
-    }
-
     // ---------- which shape is on screen ----------
 
     /**

@@ -24,20 +24,4 @@ public final class DeliveryUnavailablePromptLocators {
                     "name CONTAINS[c] 'elivery not available' AND visible == 1"
             );
 
-    public static final By DISMISS_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "name IN {'OK', 'Okay', 'Got it', 'GOT IT', 'Close', 'Dismiss',"
-                            + " 'Cancel', 'Continue', 'Change Address', 'Try Another Store'}"
-                            + " AND accessible == 1 AND visible == 1"
-            );
-
-    /**
-     * Everything on screen, used only to describe an undismissable popup
-     * in the failure message.
-     */
-    public static final By ANY_VISIBLE_CONTROL =
-            AppiumBy.iOSNsPredicateString(
-                    "accessible == 1 AND visible == 1"
-            );
-
 }

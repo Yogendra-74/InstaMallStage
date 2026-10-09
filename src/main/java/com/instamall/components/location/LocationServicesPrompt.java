@@ -55,18 +55,6 @@ public final class LocationServicesPrompt {
     }
 
     /**
-     * Takes the "Select location" route, which opens the SELECT LOCATION
-     * address sheet.
-     *
-     * @return true if the sheet was there and got tapped, false if there
-     *         was nothing to handle.
-     */
-    public static boolean chooseSelectLocation() {
-
-        return tap(LocationServicesPromptLocators.SELECT_LOCATION);
-    }
-
-    /**
      * Dismisses the sheet and leaves the home screen without a location —
      * the store feed stays empty in that state.
      */

@@ -27,22 +27,6 @@ public final class ProfilePageLocators {
      * The signed-in user's display name, as configured for the profile
      * account. Rendered as a plain StaticText under the INSTAMALL header.
      */
-    /**
-     * The display name, matched loosely on whitespace: the header prints
-     * it with stray spaces ("  Sudhanshu   Ranjan"), so each gap in the
-     * expected name is allowed to be any run of spaces.
-     */
-    public static By userName(String displayName) {
-
-        String pattern = "\\\\s*"
-                + String.join("\\\\s+", displayName.trim().split("\\s+"))
-                + "\\\\s*";
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeStaticText' AND name MATCHES '"
-                        + pattern + "' AND accessible == 1");
-    }
-
     public static By userEmail(String email) {
 
         return AppiumBy.iOSNsPredicateString(
@@ -98,13 +82,9 @@ public final class ProfilePageLocators {
 
     public static final By MENU_MANAGE_ADDRESSES = menuRow("Manage addresses");
 
-    public static final By MENU_ACCOUNT_SETTINGS = menuRow("Account settings");
-
     public static final By MENU_HELP_SUPPORT = menuRow("Help & support");
 
     public static final By MENU_ABOUT_LEGAL = menuRow("About & legal");
-
-    public static final By MENU_LOGOUT = menuRow("Log out");
 
     // ---------- Logout confirmation dialog ----------
 

@@ -58,16 +58,6 @@ public final class AboutLegalPageLocators {
                     "name BEGINSWITH 'Keep' AND accessible == 1 AND visible == 1"
             );
 
-    public static final By CONSENT_CONFIRMATION_PROCEED =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH[c] 'Turn o' AND accessible == 1 AND visible == 1"
-                            + " AND type != 'XCUIElementTypeStaticText'"
-            );
-
-    public static final By VIRTUAL_TRY_ON_DESCRIPTION =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'Allow AI Try-On' AND accessible == 1");
-
     // The document links became Buttons, the headings stayed text.
     private static By staticText(String name) {
 

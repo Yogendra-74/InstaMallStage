@@ -47,17 +47,6 @@ public class HomePage extends BasePage {
         return this;
     }
 
-    public HomePage openStore(String storeName) {
-
-        // The feed animates in; wait for the card to stop moving so the
-        // tap does not land on the neighbouring card.
-        settle(HomePageLocators.storeCard(storeName));
-
-        click(HomePageLocators.storeCard(storeName));
-
-        return this;
-    }
-
     /**
      * @return the accessible names of the store cards currently on the
      *         feed, each reading brand, address and delivery estimate.
@@ -96,25 +85,6 @@ public class HomePage extends BasePage {
         return this;
     }
 
-    /**
-     * Opens whichever store the feed is leading with.
-     *
-     * @return the card's accessible name, for the log.
-     */
-    public String openFirstAvailableStore() {
-
-        WebElement card = WaitUtils.waitForVisibility(
-                HomePageLocators.ANY_STORE_CARD, FIRST_PAINT_TIMEOUT);
-
-        String cardName = card.getAttribute("name");
-
-        settle(HomePageLocators.ANY_STORE_CARD);
-
-        click(HomePageLocators.ANY_STORE_CARD);
-
-        return cardName;
-    }
-
     public HomePage search(String query) {
 
         type(HomePageLocators.SEARCH_INSTAMALL, query);
@@ -133,36 +103,6 @@ public class HomePage extends BasePage {
     public HomePage openSearch() {
 
         click(HomePageLocators.SEARCH_INSTAMALL);
-
-        return this;
-    }
-
-    /**
-     * Opens the dedicated Malls list (com.instamall.pages.malls.MallsListPage)
-     * via EXPLORE MALLS's own "See all" link.
-     *
-     * FRAGILE: seeAll() is positional (1-based, in render order) and
-     * EXPLORE MALLS was the 3rd section when this was mapped — MIAMI'S
-     * FAVORITES, then NEWEST TO INSTAMALL, then EXPLORE MALLS. A reordered
-     * or added section on Home shifts this without warning.
-     */
-    public HomePage openExploreMallsSeeAll() {
-
-        click(HomePageLocators.seeAll(3));
-
-        return this;
-    }
-
-    public HomePage openShopByCategory() {
-
-        click(HomePageLocators.SHOP_BY_CATEGORY);
-
-        return this;
-    }
-
-    public HomePage openBag() {
-
-        click(HomePageLocators.TAB_BAG);
 
         return this;
     }

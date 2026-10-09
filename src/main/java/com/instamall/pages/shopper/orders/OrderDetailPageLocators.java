@@ -29,9 +29,6 @@ public final class OrderDetailPageLocators {
                     "name == 'BACK' AND accessible == 1"
             );
 
-    public static final By OPEN_CHAT =
-            AppiumBy.accessibilityId("Open chat");
-
     /**
      * Reads "Order number IM-XXXXX" — the id can be read off this same
      * element rather than needing a separate locator per order.
@@ -41,21 +38,10 @@ public final class OrderDetailPageLocators {
                     "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Order number' AND accessible == 1"
             );
 
-    public static final By FULFILMENT_TYPE_BADGE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'DELIVERY' AND accessible == 1"
-            );
-
-    public static final By CUSTOMER_INFO_TOGGLE =
-            AppiumBy.accessibilityId("Customer info");
-
     public static final By STATUS_IN_PROGRESS =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeStaticText' AND name == 'IN PROGRESS' AND accessible == 1"
             );
-
-    public static final By STORE_LOCATION_BUTTON =
-            AppiumBy.accessibilityId("Store location");
 
     public static By storeName(String brandUppercase) {
 
@@ -77,9 +63,6 @@ public final class OrderDetailPageLocators {
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeStaticText' AND name ENDSWITH ' done' AND accessible == 1"
             );
-
-    public static final By VIEW_PRODUCT_BUTTON =
-            AppiumBy.accessibilityId("VIEW PRODUCT");
 
     public static By productTitle(String productName) {
 
@@ -184,11 +167,6 @@ public final class OrderDetailPageLocators {
                     "name == 'Proceed' AND accessible == 1"
             );
 
-    public static final By ISSUE_REFUND_CONFIRM_CANCEL =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Cancel' AND accessible == 1"
-            );
-
     // ---------- "Order processed" alert (after Validate and proceed with
     // every item in the run rejected — confirmed live: the order itself
     // is cancelled, same as ShopperHomePageLocators.NO_ACTIVE_ORDERS_MESSAGE
@@ -198,11 +176,6 @@ public final class OrderDetailPageLocators {
     public static final By ORDER_PROCESSED_TITLE =
             AppiumBy.iOSNsPredicateString(
                     "name == 'Order processed' AND accessible == 1"
-            );
-
-    public static final By ORDER_PROCESSED_MESSAGE =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Order submitted with no items to pick up.' AND accessible == 1"
             );
 
     public static final By ORDER_PROCESSED_OK_BUTTON =
@@ -215,19 +188,6 @@ public final class OrderDetailPageLocators {
     public static final By GOT_IT_SHEET_TITLE =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeStaticText' AND name == 'Got it' AND accessible == 1"
-            );
-
-    /**
-     * "BURBERRY · For Duel" — brand plus the customer's first name.
-     */
-    public static final By GOT_IT_SHEET_SUBTITLE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name CONTAINS[c] '· For ' AND accessible == 1"
-            );
-
-    public static final By PER_UNIT_PRICE_LABEL =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Per Unit Price' AND accessible == 1"
             );
 
     /**
@@ -283,27 +243,9 @@ public final class OrderDetailPageLocators {
                     "name == 'Accept this item?' AND accessible == 1"
             );
 
-    public static final By ACCEPT_ITEM_SUBTITLE =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Confirm you picked up this item.' AND accessible == 1"
-            );
-
-    /**
-     * "Quantity: 1 of 1".
-     */
-    public static final By ACCEPT_ITEM_QUANTITY =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Quantity:' AND accessible == 1"
-            );
-
     public static final By ACCEPT_ITEM_PROCEED_BUTTON =
             AppiumBy.iOSNsPredicateString(
                     "name == 'Proceed' AND accessible == 1"
-            );
-
-    public static final By ACCEPT_ITEM_CANCEL_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Cancel' AND accessible == 1"
             );
 
     // ---------- "Confirm payment" sheet (opened by VALIDATE_AND_PROCEED_BUTTON) ----------
@@ -345,18 +287,13 @@ public final class OrderDetailPageLocators {
                     "name BEGINSWITH 'Confirm payment $' AND accessible == 1"
             );
 
-    public static final By CONFIRM_PAYMENT_CANCEL_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Cancel' AND accessible == 1"
-            );
-
     // ---------- "Capture the receipt" screen (the app's own screen) ----------
     //
     // Confirmed against a page source dump taken from the live screen.
-    // Its own SCAN_RECEIPT_BUTTON opens Apple's VNDocumentCameraViewController
-    // (a system component, not app UI, confirmed separately against its own
-    // page source dump — see the system-camera locators below), which on
-    // this Simulator fails immediately with a concrete, unambiguous error:
+    // Opening this screen's system document scanner
+    // (VNDocumentCameraViewController, a system component, not app UI,
+    // confirmed separately against its own page source dump) fails
+    // immediately on this Simulator with a concrete, unambiguous error:
     // "Scan failed — The operation couldn't be completed.
     // (AVFoundationErrorDomain error -11800.)" — Apple's own "no camera
     // device" error, reproduced twice (once automatically on opening the
@@ -364,82 +301,9 @@ public final class OrderDetailPageLocators {
     // REQUIRES A REAL DEVICE: no software workaround exists for this on a
     // Simulator with no camera hardware.
 
-    public static final By RECEIPT_SCREEN_HEADER =
-            AppiumBy.iOSNsPredicateString(
-                    "name CONTAINS 'RECEIPT ·' AND accessible == 1"
-            );
-
     public static final By RECEIPT_SCREEN_TITLE =
             AppiumBy.iOSNsPredicateString(
                     "name == 'Capture the receipt' AND accessible == 1"
-            );
-
-    public static final By RECEIPT_SCREEN_INSTRUCTIONS =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Position the receipt on a flat surface — edges are"
-                            + " detected and cropped automatically.' AND accessible == 1"
-            );
-
-    /**
-     * Opens the system document scanner (VNDocumentCameraViewController).
-     * An {@code XCUIElementTypeOther}, not a Button — iOS renders it as a
-     * plain accessible container here.
-     */
-    public static final By SCAN_RECEIPT_BUTTON =
-            AppiumBy.accessibilityId("Scan receipt");
-
-    /**
-     * The app's own alert once VNDocumentCameraViewController reports back
-     * a capture failure — reliably reproduced on the Simulator (no camera
-     * device), not expected on a real device with a working camera.
-     */
-    public static final By SCAN_FAILED_TITLE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Scan failed' AND accessible == 1"
-            );
-
-    public static final By SCAN_FAILED_MESSAGE =
-            AppiumBy.iOSNsPredicateString(
-                    "name CONTAINS 'AVFoundationErrorDomain' AND accessible == 1"
-            );
-
-    public static final By SCAN_FAILED_OK_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name == 'OK' AND accessible == 1"
-            );
-
-    // ---------- "Capture the receipt" — the system camera view (VNDocumentCameraViewController) ----------
-    //
-    // Apple's own document scanner, confirmed against its own page source
-    // dump to be system UI (springboard-level), not this app's own — same
-    // gap as above. Its locators are still captured below for when this is
-    // run against a real device: this same screen presented itself once
-    // automatically right after CONFIRM_PAYMENT, then again on a manual
-    // SCAN_RECEIPT_BUTTON tap, both times over a solid-black feed with no
-    // camera preview.
-
-    public static final By SYSTEM_CAMERA_CLOSE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name == 'Cancel' AND accessible == 1"
-            );
-
-    public static final By SHOW_FILTER_SETTINGS =
-            AppiumBy.accessibilityId("Show filter settings");
-
-    public static final By AUTOMATIC_CAPTURE_TOGGLE =
-            AppiumBy.accessibilityId("Automatic document capture enabled");
-
-    /**
-     * The shutter. Its accessible name is "Scan document", not "Shutter"
-     * — the visible "Shutter" label under it is a separate, non-
-     * interactive caption.
-     */
-    public static final By SCAN_DOCUMENT_BUTTON =
-            AppiumBy.accessibilityId("Scan document");
-
-    public static final By POSITION_DOCUMENT_PROMPT =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Position the document in view.' AND accessible == 1"
             );
 
     // ---------- Beyond receipt capture — NOT YET CAPTURED (blocked by the camera gap above) ----------
@@ -459,11 +323,6 @@ public final class OrderDetailPageLocators {
     public static final By START_HANDOFF_SHEET_PROCEED =
             AppiumBy.iOSNsPredicateString(
                     "name == 'Proceed' AND accessible == 1"
-            );
-
-    public static final By START_HANDOFF_SHEET_CANCEL =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Cancel' AND accessible == 1"
             );
 
     // ---------- "Capture handoff photo" screen ----------

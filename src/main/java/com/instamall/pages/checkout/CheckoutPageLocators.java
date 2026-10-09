@@ -54,12 +54,6 @@ public final class CheckoutPageLocators {
                     "type == 'XCUIElementTypeStaticText' AND name == 'Switch to delivery' AND accessible == 1"
             );
 
-    public static final By EDIT_PIN =
-            AppiumBy.accessibilityId("Edit Pin");
-
-    public static final By MAP_PIN =
-            AppiumBy.accessibilityId("Map pin");
-
     // ---------- Delivery speed ----------
 
     // Names carry fee and window: "Priority $14.99 7:21am–7:38am".
@@ -116,67 +110,11 @@ public final class CheckoutPageLocators {
         );
     }
 
-    /**
-     * Warning chip shown when the address is far from the store.
-     *
-     * Absent from the captured dump (that run's address was nearby), so
-     * this one is still unverified — it is only ever read as an optional
-     * check, never waited on.
-     */
-    public static final By FAR_AWAY_WARNING =
-            AppiumBy.iOSNsPredicateString(
-                    "name CONTAINS 'far away' AND accessible == 1"
-            );
-
-    public static final By DELIVERY_INSTRUCTIONS =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Handoff.' AND accessible == 1"
-            );
-
-    public static final By CONTACT_ROW =
-            AppiumBy.iOSNsPredicateString(
-                    "name CONTAINS '+1 (' AND accessible == 1"
-            );
-
-    // ---------- Order summary ----------
-
-    public static final By ORDER_SUMMARY_HEADER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'DELIVERY ' AND accessible == 1"
-            );
-
-    /**
-     * Store row in the summary, e.g. "BURBERRY 1 Item" — the brand is
-     * uppercased here, unlike everywhere else.
-     */
-    public static By summaryStoreRow(String storeName) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeButton' AND name BEGINSWITH[c] '" + storeName + "' AND accessible == 1"
-        );
-    }
-
     // ---------- Tip ----------
 
     public static final By TIP_HEADER =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeStaticText' AND name == 'Tip to Your Delivery Driver' AND accessible == 1"
-            );
-
-    /**
-     * Preset tip chip: "$5", "$10", "$15", "$20". These are Others, which
-     * is what keeps them out of {@link #ALL_CHARGE_AMOUNTS}.
-     */
-    public static By tipPreset(String amount) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeOther' AND name == '" + amount + "' AND accessible == 1"
-        );
-    }
-
-    public static final By TIP_OTHER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeOther' AND name == 'Other' AND accessible == 1"
             );
 
     // ---------- Charge breakdown ----------
@@ -252,27 +190,6 @@ public final class CheckoutPageLocators {
     public static final By GET_IT_TODAY_BUTTON =
             AppiumBy.iOSNsPredicateString(
                     "name BEGINSWITH 'Get it' AND accessible == 1 AND visible == 1"
-            );
-
-    // ---------- Return policy ----------
-
-    public static final By RETURN_POLICY_LABEL =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Return Policy' AND accessible == 1"
-            );
-
-    /**
-     * The policy text next to the label above. Varies per store — seen as
-     * "This store does not support return policy" for one boutique and
-     * "14 days from day of purchase" for another — so this matches
-     * whichever StaticText follows the label rather than one fixed
-     * string.
-     */
-    public static final By RETURN_POLICY_TEXT =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText'"
-                            + " AND (name CONTAINS[c] 'return policy' OR name CONTAINS 'days from day of purchase')"
-                            + " AND accessible == 1"
             );
 
 }

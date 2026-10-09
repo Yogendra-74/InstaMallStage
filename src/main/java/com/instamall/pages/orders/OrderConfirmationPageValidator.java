@@ -8,20 +8,6 @@ public class OrderConfirmationPageValidator extends BasePage {
 
     private static final Duration ORDER_CREATION_TIMEOUT = Duration.ofSeconds(90);
 
-    /**
-     * Tracker stages of a delivery, in the order the app renders them.
-     */
-    private static final String[] PROGRESS_STAGES =
-            {"PLACED", "SHOPPING", "DISPATCH", "ON THE WAY"};
-
-    /**
-     * A collection order tracks differently past the shopping stage —
-     * nothing is dispatched and nothing is on its way, it is made ready
-     * and then collected.
-     */
-    private static final String[] PICKUP_PROGRESS_STAGES =
-            {"PLACED", "SHOPPING", "READY", "PICKED UP"};
-
     public boolean isDisplayed() {
 
         return isDisplayed(OrderConfirmationPageLocators.ORDER_ID, ORDER_CREATION_TIMEOUT);
@@ -40,29 +26,6 @@ public class OrderConfirmationPageValidator extends BasePage {
     public boolean isStatusOrderPlaced() {
 
         return isDisplayed(OrderConfirmationPageLocators.STATUS_ORDER_PLACED);
-    }
-
-    public boolean areAllProgressStagesDisplayed() {
-
-        return areAllStagesDisplayed(PROGRESS_STAGES);
-    }
-
-    public boolean areAllPickupStagesDisplayed() {
-
-        return areAllStagesDisplayed(PICKUP_PROGRESS_STAGES);
-    }
-
-    private boolean areAllStagesDisplayed(String[] stages) {
-
-        for (String stage : stages) {
-
-            if (!isDisplayed(OrderConfirmationPageLocators.progressStage(stage))) {
-
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public boolean isStoreDisplayed(String brand) {
@@ -108,27 +71,6 @@ public class OrderConfirmationPageValidator extends BasePage {
     public boolean isPickupDetailsDisplayed() {
 
         return isPresent(OrderConfirmationPageLocators.PICKUP_DETAILS_SECTION);
-    }
-
-    public boolean isContinueShoppingDisplayed() {
-
-        return isDisplayed(OrderConfirmationPageLocators.CONTINUE_SHOPPING);
-    }
-
-    /**
-     * True at the fresh "Order received" stage, before the boutique has
-     * confirmed anything — see
-     * {@link OrderConfirmationPageLocators#STATUS_EXPLAINER_STILL_CONFIRMING}.
-     */
-    public boolean isStillConfirmingWithBoutique() {
-
-        return isDisplayed(OrderConfirmationPageLocators.STATUS_EXPLAINER_STILL_CONFIRMING);
-    }
-
-    public boolean isArrivalNotFinalDisplayed() {
-
-        return isDisplayed(OrderConfirmationPageLocators.ARRIVAL_NOT_FINAL_LABEL)
-                && isDisplayed(OrderConfirmationPageLocators.UPDATING_ARRIVAL_TIME);
     }
 
 }

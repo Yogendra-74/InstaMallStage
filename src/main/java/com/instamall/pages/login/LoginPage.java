@@ -61,18 +61,6 @@ public class LoginPage extends BasePage {
         return this;
     }
 
-    public LoginPage clickSendOTP() {
-
-        // Button starts disabled (traits="NotEnabled") until a valid
-        // number is entered and the consent box is ticked — wait for it
-        // to activate before tapping.
-        WaitUtils.waitForEnabled(LoginPageLocators.SEND_OTP_BUTTON);
-
-        click(LoginPageLocators.SEND_OTP_BUTTON);
-
-        return this;
-    }
-
     /**
      * Ticks the messaging-consent box, leaving it alone if it is already
      * ticked. Send code stays disabled without it, whatever the number.
@@ -95,13 +83,6 @@ public class LoginPage extends BasePage {
         String value = checkbox.getAttribute("value");
 
         return value != null && value.endsWith(", checked");
-    }
-
-    public LoginPage clickCountryCodePicker() {
-
-        click(LoginPageLocators.COUNTRY_CODE);
-
-        return this;
     }
 
     public LoginPage clickContinueWithEmail() {

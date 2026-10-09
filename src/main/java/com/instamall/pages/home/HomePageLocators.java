@@ -44,47 +44,11 @@ public final class HomePageLocators {
         );
     }
 
-    // Unread-notification count next to the bell.
-    // VERIFY: not seen in the redesigned header, which shows an unnamed
-    // bell and the bag count ("3", an Other) instead.
-    public static final By NOTIFICATION_BADGE =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name MATCHES '^[0-9]+$' AND accessible == 1"
-            );
-
-    // ---------- Order tracking strip ----------
-
-    public static final By ORDER_IN_PROGRESS_CARD =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Confirming your order' AND accessible == 1"
-            );
-
-    // VERIFY: no returned order was on the account to check this against
-    // the redesigned strip.
-    public static final By ORDER_RETURN_CARD =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'RECEIVED' AND accessible == 1"
-            );
-
     // ---------- Body ----------
 
     public static final By SEARCH_INSTAMALL =
             AppiumBy.iOSNsPredicateString(
                     "name == 'Search designers, stores and pieces' AND accessible == 1"
-            );
-
-    // The old "Your Favorite Brands Delivered In…" banner is gone; the
-    // promise now sits in the header, beside the location chip, as
-    // "From 14 min" over "Arrival by piece".
-    public static final By DELIVERY_PROMISE_BANNER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'From ' AND name ENDSWITH ' min'"
-                            + " AND accessible == 1"
-            );
-
-    public static final By SHOP_BY_CATEGORY =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Shop by category' AND accessible == 1"
             );
 
     /**
@@ -160,16 +124,6 @@ public final class HomePageLocators {
 
     // ---------- Location empty state (shown until an address is chosen) ----------
 
-    public static final By LOCATION_EMPTY_STATE_TITLE =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Choose your location to start shopping' AND accessible == 1"
-            );
-
-    public static final By ENABLE_LOCATION_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "name == 'Enable Location' AND accessible == 1"
-            );
-
     public static final By SELECT_LOCATION_BUTTON =
             AppiumBy.iOSNsPredicateString(
                     "name == 'Select location' AND accessible == 1"
@@ -195,15 +149,6 @@ public final class HomePageLocators {
             AppiumBy.iOSNsPredicateString(
                     "(name == 'Bag' OR name ENDSWITH ' Bag') AND accessible == 1"
             );
-
-    /**
-     * Bag tab with an expected item count, e.g. tabBagWithCount(1) →
-     * "1 Bag". Use it to assert the badge rather than just to tap.
-     */
-    public static By tabBagWithCount(int itemCount) {
-
-        return AppiumBy.accessibilityId(itemCount + " Bag");
-    }
 
     public static final By TAB_PROFILE =
             AppiumBy.accessibilityId("Account");

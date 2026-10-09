@@ -28,23 +28,6 @@ public final class PaymentSheetLocators {
     public static final By CLOSE_BUTTON =
             AppiumBy.accessibilityId("UIButton.Close");
 
-    public static final By APPLE_PAY =
-            AppiumBy.accessibilityId("apple_pay_button");
-
-    public static final By OR_PAY_USING_DIVIDER =
-            AppiumBy.accessibilityId("Or pay using");
-
-    public static final By SAVED_SECTION =
-            AppiumBy.accessibilityId("Saved");
-
-    public static final By NEW_PAYMENT_METHOD_SECTION =
-            AppiumBy.accessibilityId("New payment method");
-
-    public static final By NEW_CARD =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name == 'New card'"
-            );
-
     /**
      * Saved card button. Its name is masked with bullets ("•••• 4242") and
      * its label spells the digits out ("Visa ending in 4 2 4 2"), so the
@@ -63,11 +46,6 @@ public final class PaymentSheetLocators {
     public static final By SELECTED_CARD =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeButton' AND value == '1'"
-            );
-
-    public static final By EDIT_CARD =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name == 'Edit'"
             );
 
     // Name carries the payable amount: "Pay $962.49".

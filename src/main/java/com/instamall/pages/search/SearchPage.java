@@ -28,13 +28,6 @@ public class SearchPage extends BasePage {
         return this;
     }
 
-    public SearchPage openMallsTab() {
-
-        click(SearchPageLocators.MALLS_TAB);
-
-        return this;
-    }
-
     /**
      * Switches to the Stores tab — required before searching for a store
      * by name, since the screen opens on Products and a store name search
@@ -50,21 +43,6 @@ public class SearchPage extends BasePage {
     public SearchPage openProductsTab() {
 
         click(SearchPageLocators.PRODUCTS_TAB);
-
-        return this;
-    }
-
-    /**
-     * Opens a Stores-tab result by its exact row text — see
-     * {@link SearchPageLocators#storeResult(String, String)} for why this
-     * has to be an exact match rather than a partial one.
-     */
-    public SearchPage openStoreResult(String storeName, String mallName) {
-
-        By result = SearchPageLocators.storeResult(storeName, mallName);
-
-        settle(result);
-        click(result);
 
         return this;
     }

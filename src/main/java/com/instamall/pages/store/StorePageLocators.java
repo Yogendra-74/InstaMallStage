@@ -17,34 +17,6 @@ public final class StorePageLocators {
     // The "BACK" link is gone; the header chevron is the way back.
     public static final By BACK_BUTTON = HeaderLocators.BACK_CHEVRON;
 
-    public static final By DELIVERY_PROMISE_BANNER =
-            AppiumBy.iOSNsPredicateString(
-                    "name CONTAINS[c] 'Earliest arrival' AND accessible == 1"
-            );
-
-    /**
-     * The mall name under the store title, in caps ("AVENTURA MALL").
-     * Callers pass it exactly as shown, uppercase.
-     *
-     * CAUTION: seen to disagree with the mall name given elsewhere for the
-     * same store instance — Moncler read "BRICKELL CITY CENTRE" here, yet
-     * "Bal Harbour" on its Home card and "Miami Design District" on the
-     * order it produced. Treat any single mall label as unreliable on its
-     * own; do not assert store-to-mall mapping from this alone.
-     */
-    public static By mallLabel(String mallNameUppercase) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeStaticText' AND name == '" + mallNameUppercase + "'"
-                        + " AND accessible == 1 AND visible == 1"
-        );
-    }
-
-    public static final By INDEPENDENT_SHOPPING_BANNER =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Independent Shopping Service' AND accessible == 1"
-            );
-
     public static final By SHOP_BY_CATEGORY =
             AppiumBy.iOSNsPredicateString(
                     "name == 'SHOP BY CATEGORY' AND accessible == 1"
@@ -87,44 +59,6 @@ public final class StorePageLocators {
             AppiumBy.iOSNsPredicateString(
                     "name CONTAINS ' $' AND accessible == 1 AND visible == 1"
             );
-
-    /**
-     * Department header on the grid: "MEN", "WOMEN", "ALL PRODUCTS".
-     */
-    public static By departmentHeader(String department) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeStaticText' AND name == '" + department + "' AND accessible == 1"
-        );
-    }
-
-    /**
-     * "VIEW ALL" appears once per department, so it is picked by position
-     * (1-based, in render order).
-     */
-    public static By viewAll(int occurrence) {
-
-        return AppiumBy.iOSClassChain(
-                "**/XCUIElementTypeStaticText[`name == \"VIEW ALL\" AND accessible == true`][" + occurrence + "]"
-        );
-    }
-
-    /**
-     * Product tile. The whole tile is one accessible element whose name is
-     * "<product> <brand> <price>", e.g.
-     * "Check Cotton Poplin Shirt Burberry $750".
-     *
-     * CAUTION: product names are not unique in this catalogue — there are
-     * two "Check Cotton Poplin Shirt" tiles at $750 and $680. This matches
-     * the first one; use {@link #productCard(String, String, String)} when
-     * the test needs a specific variant.
-     */
-    public static By productCard(String productName) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "name BEGINSWITH '" + productName + "' AND accessible == 1"
-        );
-    }
 
     /**
      * Exact product tile, disambiguated by brand and price as they are

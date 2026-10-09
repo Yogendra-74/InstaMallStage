@@ -82,31 +82,9 @@ public class StorePage extends BasePage {
         return this;
     }
 
-    public StorePage openProduct(String productName) {
-
-        // Grid images stream in and shift the tiles; let the tile settle
-        // so the tap opens the intended product.
-        settle(StorePageLocators.productCard(productName));
-
-        click(StorePageLocators.productCard(productName));
-
-        return this;
-    }
-
     public StorePage searchInStore(String storeName, String query) {
 
         type(StorePageLocators.searchInStore(storeName), query);
-
-        return this;
-    }
-
-    /**
-     * @param occurrence 1-based, in the order the departments render
-     *                   (MEN first, then WOMEN).
-     */
-    public StorePage openViewAll(int occurrence) {
-
-        click(StorePageLocators.viewAll(occurrence));
 
         return this;
     }

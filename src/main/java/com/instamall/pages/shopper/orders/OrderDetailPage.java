@@ -308,49 +308,6 @@ public class OrderDetailPage extends BasePage {
         return this;
     }
 
-    /**
-     * Opens the system document scanner from the app's own "Capture the
-     * receipt" screen. On a real device this opens a live camera preview;
-     * on Simulator it opens the same view over a blank feed, which fails
-     * immediately (see {@link #waitForScanFailedAlert()}).
-     */
-    public OrderDetailPage tapScanReceipt() {
-
-        click(OrderDetailPageLocators.SCAN_RECEIPT_BUTTON);
-
-        return this;
-    }
-
-    /**
-     * Taps the shutter. On a real device this captures a frame and (per
-     * the requested flow) moves to a "Keep" / retake prompt; on
-     * Simulator this is a no-op — there is no camera to capture from.
-     */
-    public OrderDetailPage tapScanDocument() {
-
-        click(OrderDetailPageLocators.SCAN_DOCUMENT_BUTTON);
-
-        return this;
-    }
-
-    /**
-     * The Simulator's own outcome of {@link #tapScanReceipt()} — reliably
-     * reproduced with no camera hardware, not expected on a real device.
-     */
-    public OrderDetailPage waitForScanFailedAlert() {
-
-        WaitUtils.waitForVisibility(OrderDetailPageLocators.SCAN_FAILED_TITLE);
-
-        return this;
-    }
-
-    public OrderDetailPage dismissScanFailedAlert() {
-
-        click(OrderDetailPageLocators.SCAN_FAILED_OK_BUTTON);
-
-        return this;
-    }
-
     // ---------- Start handoff (once a driver is assigned) — opened by
     // ShopperHomePage.tapStartHandoff() ----------
 

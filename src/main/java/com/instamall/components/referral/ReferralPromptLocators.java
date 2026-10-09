@@ -41,13 +41,7 @@ public final class ReferralPromptLocators {
                             + "/XCUIElementTypeOther[`accessible == true`][1]"
             );
 
-    public static final By COPY_CODE_BUTTON =
-            AppiumBy.accessibilityId("referral_copy_code_button");
-
     public static final By INVITE_FRIENDS_BUTTON =
             AppiumBy.accessibilityId("referral_invite_friends_button");
-
-    public static final By QR_CODE_BUTTON =
-            AppiumBy.accessibilityId("referral_qr_code_button");
 
 }

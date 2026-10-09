@@ -44,30 +44,6 @@ public final class PortalOrdersPageLocators {
     public static final By HISTORY_TAB =
             By.cssSelector("a[href='#/deliveries/status/details']");
 
-    public static final By MANIFEST_TAB =
-            By.cssSelector("a[href='#/deliveries/status/manifest/list']");
-
-    public static final By ROUTE_PLANS_TAB =
-            By.cssSelector("a[href='#/deliveries/status/route_optimization']");
-
-    // ---------- Active tab ----------
-
-    public static final By ACTIVE_SEARCH_INPUT =
-            By.cssSelector("input[placeholder='Search Customer, Order, Group Id']");
-
-    /**
-     * Shared by both tabs' search sections — scope a find to whichever
-     * tab is open rather than relying on this alone if both could ever
-     * be present at once (they should not be, given the hash routing).
-     */
-    public static final By SEARCH_BUTTON =
-            By.cssSelector("button.search-btn");
-
-    // ---------- History tab ----------
-
-    public static final By HISTORY_SEARCH_INPUT =
-            By.cssSelector("input[placeholder='Search Order ID']");
-
     // ---------- Order card (Active tab) ----------
 
     /**
@@ -93,8 +69,5 @@ public final class PortalOrdersPageLocators {
      */
     public static final By ORDER_ID_LINKS_LIST =
             By.cssSelector("a.text-monospace");
-
-    public static final By NO_RECORDS_FOUND =
-            By.xpath("//*[contains(text(), 'No Records Found')]");
 
 }

@@ -44,13 +44,6 @@ public class EditAccountPage extends BasePage {
 
     // ---------- Filling the form ----------
 
-    public EditAccountPage enterFirstName(String firstName) {
-
-        typeInto(EditAccountPageLocators.FIRST_NAME_FIELD, firstName);
-
-        return this;
-    }
-
     public EditAccountPage enterLastName(String lastName) {
 
         typeInto(EditAccountPageLocators.LAST_NAME_FIELD, lastName);

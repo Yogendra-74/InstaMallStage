@@ -37,24 +37,9 @@ public final class SystemAlerts {
         return tap(PermissionPopupLocators.ALLOW_WHILE_USING_APP);
     }
 
-    public static boolean allowLocationOnce() {
-
-        return tap(PermissionPopupLocators.ALLOW_ONCE);
-    }
-
-    public static boolean denyLocation() {
-
-        return tap(PermissionPopupLocators.DONT_ALLOW);
-    }
-
     public static boolean allowNotifications() {
 
         return tap(PermissionPopupLocators.ALLOW);
-    }
-
-    public static boolean denyNotifications() {
-
-        return tap(PermissionPopupLocators.DONT_ALLOW);
     }
 
     /**
@@ -65,16 +50,6 @@ public final class SystemAlerts {
     public static boolean allowCamera() {
 
         return tap(PermissionPopupLocators.ALLOW);
-    }
-
-    /**
-     * "Save Password?" — offered right after a sign in, on every app
-     * alike. Tapped here rather than "Not Now" so credentials are saved,
-     * per instruction to allow save-password prompts.
-     */
-    public static boolean savePassword() {
-
-        return tap(PermissionPopupLocators.SAVE_PASSWORD);
     }
 
     /**

@@ -11,7 +11,6 @@ import com.instamall.pages.profile.HelpSupportPage;
 import com.instamall.pages.profile.ProfilePage;
 import com.instamall.pages.profile.ProfilePageLocators;
 import com.instamall.waits.WaitUtils;
-import io.appium.java_client.AppiumBy;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 

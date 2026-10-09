@@ -1,10 +1,6 @@
 package com.instamall.pages.orders;
 
 import com.instamall.base.BasePage;
-import com.instamall.driver.DriverManager;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class OrdersListPage extends BasePage {
 
@@ -46,20 +42,6 @@ public class OrdersListPage extends BasePage {
 
         return waitForVisibility(OrdersListPageLocators.orderRow(orderId))
                 .getAttribute("name");
-    }
-
-    /**
-     * @return every order id currently rendered on screen, in row order
-     *         (only what has been scrolled into the accessibility tree,
-     *         same caveat as any other list screen in this app).
-     */
-    public List<String> listOrderIds() {
-
-        return DriverManager.getDriver()
-                .findElements(OrdersListPageLocators.ANY_ORDER_ROW)
-                .stream()
-                .map(row -> row.getAttribute("name").split(" ")[0])
-                .collect(Collectors.toList());
     }
 
 }

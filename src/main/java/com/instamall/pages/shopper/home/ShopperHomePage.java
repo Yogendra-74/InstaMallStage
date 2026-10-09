@@ -9,8 +9,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ShopperHomePage extends BasePage {
 
@@ -53,41 +51,6 @@ public class ShopperHomePage extends BasePage {
     public ShopperHomePage openHistoryTab() {
 
         click(ShopperHomePageLocators.HISTORY_TAB);
-
-        return this;
-    }
-
-    /**
-     * @return the accessible names of every active order card currently on
-     *         screen, each reading status, ETA, fulfilment type, customer
-     *         first name, store and total.
-     */
-    public List<String> listActiveOrderCards() {
-
-        List<String> cards = new ArrayList<>();
-
-        for (WebElement card : DriverManager.getDriver()
-                .findElements(ShopperHomePageLocators.ANY_ACTIVE_ORDER_CARD)) {
-
-            String name = card.getAttribute("name");
-
-            if (name != null && !name.isBlank()) {
-
-                cards.add(name);
-            }
-        }
-
-        return cards;
-    }
-
-    /**
-     * Opens the active order card matching every one of the given
-     * fragments — see
-     * {@link ShopperHomePageLocators#orderCardContaining(String...)}.
-     */
-    public ShopperHomePage openOrderCardContaining(String... fragments) {
-
-        tapCardCta(ShopperHomePageLocators.orderCardContaining(fragments));
 
         return this;
     }
@@ -152,13 +115,6 @@ public class ShopperHomePage extends BasePage {
                 .perform();
     }
 
-    public ShopperHomePage openReturns() {
-
-        click(ShopperHomePageLocators.TAB_RETURNS);
-
-        return this;
-    }
-
     public ShopperHomePage openProfile() {
 
         click(ShopperHomePageLocators.TAB_PROFILE);
@@ -169,13 +125,6 @@ public class ShopperHomePage extends BasePage {
     public ShopperHomePage openHomeTab() {
 
         click(ShopperHomePageLocators.TAB_HOME);
-
-        return this;
-    }
-
-    public ShopperHomePage openShiftStatusOptions() {
-
-        click(ShopperHomePageLocators.SHIFT_STATUS_TOGGLE);
 
         return this;
     }

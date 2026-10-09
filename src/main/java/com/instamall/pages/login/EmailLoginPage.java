@@ -83,13 +83,6 @@ public class EmailLoginPage extends BasePage {
         return this;
     }
 
-    public EmailLoginPage clickContinueWithPhone() {
-
-        click(EmailLoginPageLocators.CONTINUE_WITH_PHONE);
-
-        return this;
-    }
-
     public EmailLoginPage clickForgotPassword() {
 
         click(EmailLoginPageLocators.FORGOT_PASSWORD);

@@ -44,10 +44,6 @@ public final class AccountSettingsPageLocators {
 
     public static final By SECTION_PRIVACY = staticText("Privacy");
 
-    public static final By NOTIFICATIONS_ROW =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Notifications & analytics' AND accessible == 1");
-
     // ---------- ACCOUNT ACTIONS ----------
 
     public static final By SECTION_ACCOUNT_ACTIONS = staticText("Account actions");
