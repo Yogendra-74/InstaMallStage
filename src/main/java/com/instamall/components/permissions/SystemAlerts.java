@@ -30,16 +30,133 @@ public final class SystemAlerts {
 
     /**
      * Grants location while the app is in use, which is what the shopping
-     * flow needs for nearby stores and delivery.
+     * flow needs for nearby stores and delivery. Waits up to
+     * {@link #ALERT_TIMEOUT} for the alert, then delegates the actual
+     * accept to {@link #grantLocationIfShowingNow()}.
      */
     public static boolean allowLocationWhileUsingApp() {
 
-        return tap(PermissionPopupLocators.ALLOW_WHILE_USING_APP);
+        return WaitUtils.isVisible(PermissionPopupLocators.ALLOW_WHILE_USING_APP, ALERT_TIMEOUT)
+                && grantLocationIfShowingNow();
     }
 
+    /**
+     * Waits up to {@link #ALERT_TIMEOUT} for the Notification permission
+     * alert, then delegates the accept to
+     * {@link #grantNotificationIfShowingNow()}.
+     */
     public static boolean allowNotifications() {
 
-        return tap(PermissionPopupLocators.ALLOW);
+        return WaitUtils.isVisible(PermissionPopupLocators.ALLOW, ALERT_TIMEOUT)
+                && grantNotificationIfShowingNow();
+    }
+
+    /**
+     * Single no-wait pass at the Notification permission alert — accepts
+     * it if that alert is on screen right now, otherwise does nothing.
+     * Meant for a caller already polling in a loop of its own, where the
+     * two permission alerts this app can raise after sign-in are not
+     * guaranteed to arrive in any fixed order, so a tight loop needs an
+     * instant check for each rather than a blocking wait on either one.
+     * See {@link #acceptAlertButtonIfShowingNow} for the mechanism.
+     *
+     * @return true if the alert was there and got tapped
+     */
+    public static boolean grantNotificationIfShowingNow() {
+
+        return acceptAlertButtonIfShowingNow("Allow");
+    }
+
+    /**
+     * Single no-wait pass at the Location permission alert — same shape
+     * as {@link #grantNotificationIfShowingNow()}. See
+     * {@link #acceptAlertButtonIfShowingNow} for the mechanism, and its
+     * own doc comment for why this goes through "mobile: alert" rather
+     * than an element-targeted click()/tap(): confirmed live, several
+     * element-targeted approaches tried here previously (plain click(),
+     * pressAndRelease(), a coordinate tap derived from the element's own
+     * rect) all either silently failed to register or were simply
+     * unproven guesses; "mobile: alert" with an explicit buttonLabel was
+     * then confirmed live, directly and repeatably — getButtons()
+     * returning the real three button labels, accept() with
+     * "Allow While Using App" actually clearing the alert (status bar's
+     * location arrow lighting up as proof, not just the alert
+     * disappearing) — against this exact alert, including freshly
+     * reproduced (xcrun simctl privacy reset location, relaunch) rather
+     * than assumed from an old attempt elsewhere in this class' history.
+     *
+     * @return true if the alert was there and got tapped
+     */
+    public static boolean grantLocationIfShowingNow() {
+
+        return acceptAlertButtonIfShowingNow("Allow While Using App");
+    }
+
+    /**
+     * Single no-wait pass at the App Tracking Transparency alert — same
+     * shape as {@link #grantNotificationIfShowingNow()}, same "Allow"
+     * button. Named separately for readability at the call site, same
+     * reasoning as {@link #allowCamera()} alongside {@link
+     * #allowNotifications()}.
+     *
+     * The one meant for a caller that has already been polling with
+     * {@link #grantAnyShowingNow()} while waiting for the app's first
+     * screen to show (both app's onboarding waits do): by the time that
+     * loop exits, this alert — which shows at launch, within a second or
+     * two of it or not at all — has very likely already been caught and
+     * cleared there, which is exactly why this is a no-wait check rather
+     * than another blocking {@link #ALERT_TIMEOUT}-long probe on top of
+     * it.
+     *
+     * @return true if the alert was there and got tapped
+     */
+    public static boolean grantTrackingIfShowingNow() {
+
+        return acceptAlertButtonIfShowingNow("Allow");
+    }
+
+    /**
+     * Single no-wait pass at whatever alert is on screen right now,
+     * accepting it only if it offers the exact button given — leaves any
+     * other alert alone rather than tapping a wrong button blind. Shares
+     * its "mobile: alert" mechanism with {@link #grantAnyShowingNow()};
+     * the difference is this one is for a caller that needs to know
+     * specifically whether its own alert got answered, not just that
+     * something did.
+     */
+    private static boolean acceptAlertButtonIfShowingNow(String buttonLabel) {
+
+        List<String> buttons;
+
+        try {
+
+            @SuppressWarnings("unchecked")
+            List<String> found = (List<String>) DriverManager.getDriver()
+                    .executeScript("mobile: alert", Map.of("action", "getButtons"));
+            buttons = found;
+
+        } catch (Exception noAlertOrUnsupported) {
+
+            return false;
+        }
+
+        if (buttons == null || !buttons.contains(buttonLabel)) {
+
+            return false;
+        }
+
+        try {
+
+            DriverManager.getDriver().executeScript("mobile: alert",
+                    Map.of("action", "accept", "buttonLabel", buttonLabel));
+            return true;
+
+        } catch (Exception acceptFailed) {
+
+            // Same tolerance as grantAnyShowingNow(): a poll loop tries
+            // again next pass rather than failing on a transient issue.
+            return false;
+        }
     }
 
     /**
@@ -49,7 +166,14 @@ public final class SystemAlerts {
      */
     public static boolean allowCamera() {
 
-        return tap(PermissionPopupLocators.ALLOW);
+        // Confirmed live (Single_Order_Complete Phase 2, step by step):
+        // "'IM Shopper Stage' would like to access the Camera", buttons
+        // "Don't Allow" / "Allow", raised the moment Confirm payment is
+        // tapped. Answered through the alert API like every other grant
+        // here, not by tapping the "Allow" element (see the class doc
+        // comment for why that can silently miss on a system alert).
+        return WaitUtils.isVisible(PermissionPopupLocators.ALLOW, ALERT_TIMEOUT)
+                && acceptAlertButtonIfShowingNow("Allow");
     }
 
     /**
@@ -63,7 +187,14 @@ public final class SystemAlerts {
      */
     public static boolean allowTracking() {
 
-        return tap(PermissionPopupLocators.ALLOW);
+        // Waits for the alert, then answers it through the alert API
+        // rather than tap(): confirmed live (Single_Order_Complete Phase
+        // 2, step by step) that "mobile: alert" with buttonLabel "Allow"
+        // is what reliably lands on this springboard alert — the same
+        // mechanism allowNotifications() already uses, for the same
+        // reason the class doc comment gives.
+        return WaitUtils.isVisible(PermissionPopupLocators.ALLOW, ALERT_TIMEOUT)
+                && grantTrackingIfShowingNow();
     }
 
     /**

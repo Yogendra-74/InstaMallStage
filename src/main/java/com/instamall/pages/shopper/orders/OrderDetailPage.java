@@ -25,7 +25,7 @@ public class OrderDetailPage extends BasePage {
 
             SystemAlerts.grantAnyShowingNow();
 
-            return WaitUtils.isVisibleNow(OrderDetailPageLocators.ORDER_NUMBER_BUTTON)
+            return WaitUtils.isVisibleNow(OrderDetailPageLocators.RUN_PROGRESS_LABEL)
                             && WaitUtils.isVisibleNow(OrderDetailPageLocators.VALIDATE_AND_PROCEED_BUTTON)
                     ? Boolean.TRUE
                     : null;
@@ -33,15 +33,6 @@ public class OrderDetailPage extends BasePage {
         }, SCREEN_APPEARS_WITHIN);
 
         return this;
-    }
-
-    /**
-     * @return the order id, read off "Order number IM-XXXXX".
-     */
-    public String getOrderId() {
-
-        return getText(OrderDetailPageLocators.ORDER_NUMBER_BUTTON)
-                .replaceFirst("^Order number\\s*", "").trim();
     }
 
     /**
@@ -155,67 +146,6 @@ public class OrderDetailPage extends BasePage {
         return this;
     }
 
-    // ---------- Price edit, from the "Got it" sheet (opened via
-    // OrderDetailPageLocators.PRICE_EDIT_ICON's own doc comment) ----------
-
-    /**
-     * Turns the Per Unit Price value editable. Must be called before
-     * {@link #getPerUnitPrice()} or {@link #setPerUnitPrice(String)} —
-     * the value is a plain StaticText until this is tapped.
-     */
-    public OrderDetailPage openPriceEditor() {
-
-        click(OrderDetailPageLocators.PRICE_EDIT_ICON);
-
-        return this;
-    }
-
-    /**
-     * @return the per-unit price field's current value, e.g. "725.00" —
-     *         openPriceEditor() must have already been called.
-     */
-    public String getPerUnitPrice() {
-
-        return WaitUtils.waitForPresence(OrderDetailPageLocators.PRICE_EDIT_FIELD).getText();
-    }
-
-    /**
-     * Overwrites the per-unit price — openPriceEditor() must have
-     * already been called. Confirmed live: a lower price here credits
-     * the difference to the customer's InstaMall Wallet immediately,
-     * and the Confirm Payment sheet's total drops accordingly (see
-     * PRICE_EDIT_ICON's own doc comment).
-     *
-     * Verified then retyped character by character on a mismatch rather
-     * than trusting a single bulk sendKeys — the same flakiness
-     * EmailLoginPage/ShopperLoginPage's own typeInto() guards against
-     * elsewhere in this suite, and a price is exactly the kind of value
-     * a dropped character would corrupt silently (e.g. "725.00" landing
-     * as "75.00").
-     */
-    public OrderDetailPage setPerUnitPrice(String newPrice) {
-
-        WebElement field = WaitUtils.waitForPresence(OrderDetailPageLocators.PRICE_EDIT_FIELD);
-
-        field.clear();
-        field.sendKeys(newPrice);
-
-        if (newPrice.equals(field.getText())) {
-
-            return this;
-        }
-
-        WebElement retryField = WaitUtils.waitForPresence(OrderDetailPageLocators.PRICE_EDIT_FIELD);
-
-        retryField.clear();
-
-        for (char digit : newPrice.toCharArray()) {
-
-            retryField.sendKeys(String.valueOf(digit));
-        }
-
-        return this;
-    }
 
     public OrderDetailPage waitForAcceptItemSheet() {
 
@@ -250,32 +180,15 @@ public class OrderDetailPage extends BasePage {
     }
 
     /**
-     * @return the payable amount read off the sheet's own confirm
-     *         button, e.g. "1,345.64" from "Confirm payment $1,345.64" —
-     *         the button's name embeds the live total, so this reads it
-     *         rather than assuming a fixed one.
-     */
-    public String getConfirmPaymentAmount() {
-
-        String label = getText(OrderDetailPageLocators.ANY_CONFIRM_PAYMENT_BUTTON);
-
-        return label.replaceFirst("^Confirm payment \\$", "").trim();
-    }
-
-    public OrderDetailPage confirmPayment(String amount) {
-
-        click(OrderDetailPageLocators.confirmPaymentButton(amount));
-
-        return this;
-    }
-
-    /**
-     * Reads the amount off the sheet and taps its confirm button — the
-     * usual way to call this, since the total is not known beforehand.
+     * Taps the sheet's confirm button, whatever total it carries. Callers
+     * that want to report the amount read it with
+     * {@link #getConfirmPaymentAmount()} first.
      */
     public OrderDetailPage confirmPayment() {
 
-        return confirmPayment(getConfirmPaymentAmount());
+        click(OrderDetailPageLocators.ANY_CONFIRM_PAYMENT_BUTTON);
+
+        return this;
     }
 
     // ---------- Step 8: "Capture the receipt" — see the locators' own
@@ -292,6 +205,57 @@ public class OrderDetailPage extends BasePage {
      * times out with no idea why.
      */
     private static final Duration RECEIPT_SCREEN_APPEARS_WITHIN = Duration.ofSeconds(60);
+
+    /**
+     * The Simulator's way past "Capture the receipt": the capture button
+     * is not usable without a camera, so the staging build's "DEV ·
+     * Sample receipt" bypass is tapped instead. Confirmed live: it lands
+     * on the "Looks good?" review screen.
+     */
+    public OrderDetailPage useSampleReceipt() {
+
+        click(OrderDetailPageLocators.DEV_SAMPLE_RECEIPT);
+
+        WaitUtils.waitForVisibility(OrderDetailPageLocators.LOOKS_GOOD_TITLE);
+
+        return this;
+    }
+
+    /**
+     * USE PHOTO on "Looks good?" — opens the "Submit receipt?" sheet.
+     */
+    public OrderDetailPage usePhoto() {
+
+        click(OrderDetailPageLocators.USE_PHOTO_BUTTON);
+
+        WaitUtils.waitForVisibility(OrderDetailPageLocators.SUBMIT_RECEIPT_TITLE);
+
+        return this;
+    }
+
+    /**
+     * Proceed on "Submit receipt?" — uploads the receipt and submits the
+     * order, ending on the "Order processed" message.
+     */
+    public OrderDetailPage submitReceipt() {
+
+        click(OrderDetailPageLocators.SUBMIT_RECEIPT_PROCEED);
+
+        WaitUtils.waitForVisibility(OrderDetailPageLocators.ORDER_PROCESSED_TITLE);
+
+        return this;
+    }
+
+    /**
+     * OK on "Order processed / Receipt uploaded and order submitted." —
+     * back to Home, where the order's card now reads WAITING FOR DRIVER.
+     */
+    public OrderDetailPage dismissReceiptProcessed() {
+
+        click(OrderDetailPageLocators.RECEIPT_PROCESSED_OK);
+
+        return this;
+    }
 
     public OrderDetailPage waitForReceiptCaptureScreen() {
 

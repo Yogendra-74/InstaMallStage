@@ -4,12 +4,20 @@ import com.instamall.components.navigation.HeaderLocators;
 import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.By;
 
+
 /**
  * Checkout screen. Verified against a page source dump.
  *
  * Worth knowing: the full charge breakdown (subtotal, delivery, tax,
  * service fee, tip, total) lives on THIS screen, below the tip selector.
  * The order confirmation screen only shows the total.
+ *
+ * Two kinds of thing live here. The {@link By} locators are what gets
+ * tapped or waited on. The plain-string names and prefixes are what
+ * CheckoutPage.read() matches against in a single page-source snapshot
+ * — one call for every question the flow asks of this screen, where a
+ * locator apiece used to cost a WebDriver round trip apiece (see
+ * CheckoutPage.Screen's own doc comment for the numbers).
  */
 public final class CheckoutPageLocators {
 
@@ -20,15 +28,10 @@ public final class CheckoutPageLocators {
     // The "BACK" link is gone; the header chevron is the way back.
     public static final By BACK_BUTTON = HeaderLocators.BACK_CHEVRON;
 
-    public static final By DELIVER_TO_HEADER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Deliver to' AND accessible == 1"
-            );
+    // ---------- Mode: delivery or pickup ----------
 
-    public static final By SWITCH_TO_PICKUP =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Switch to pickup' AND accessible == 1"
-            );
+    /** The header a delivery checkout carries. */
+    public static final String DELIVER_TO_HEADER_TEXT = "Deliver to";
 
     /**
      * The header a checkout opened for collection carries, where a
@@ -39,32 +42,29 @@ public final class CheckoutPageLocators {
      * anywhere on the screen — so a flow that assumes the delivery form
      * reads a perfectly good checkout as one that never loaded.
      */
-    public static final By PICKUP_FROM_HEADER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Pickup from' AND accessible == 1"
-            );
+    public static final String PICKUP_FROM_HEADER_TEXT = "Pickup from";
 
     /**
      * The way back to delivery, which only a pickup checkout offers — the
      * counterpart of SWITCH_TO_PICKUP, and the clearest sign of which mode
      * the screen is in.
      */
-    public static final By SWITCH_TO_DELIVERY =
+    public static final String SWITCH_TO_DELIVERY_TEXT = "Switch to delivery";
+
+    public static final By SWITCH_TO_PICKUP =
             AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Switch to delivery' AND accessible == 1"
+                    "type == 'XCUIElementTypeStaticText' AND name == 'Switch to pickup' AND accessible == 1"
             );
 
     // ---------- Delivery speed ----------
 
     // Names carry fee and window: "Priority $14.99 7:21am–7:38am".
+    public static final String PRIORITY_PREFIX = "Priority";
+    public static final String SCHEDULE_PREFIX = "Schedule";
+
     public static final By PRIORITY_OPTION =
             AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Priority' AND accessible == 1"
-            );
-
-    public static final By SCHEDULE_OPTION =
-            AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Schedule' AND accessible == 1"
+                    "name BEGINSWITH '" + PRIORITY_PREFIX + "' AND accessible == 1"
             );
 
     /**
@@ -95,79 +95,13 @@ public final class CheckoutPageLocators {
     // ---------- Address / contact ----------
 
     /**
-     * Delivery address row: "Z9 Ventures 38 NW 24th St, Miami, FL 33127,
-     * USA".
-     *
-     * Case-insensitive on purpose — the same address is uppercase on the
-     * home header and in the saved-address list ("Z9 VENTURES") but title
-     * case here.
+     * Delivery address row, a Button: "Deliver to. Z9 Ventures 38 NW
+     * 24th St, Miami, FL 33127, USA". Matched by this prefix and then by
+     * name inside CheckoutPage.Screen.isDeliveringTo(); a guest checkout,
+     * which has no saved, named address to assert on, checks only that
+     * the row populated at all.
      */
-    public static By addressName(String name) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Deliver to.'"
-                        + " AND name CONTAINS[c] '" + name + "' AND accessible == 1"
-        );
-    }
-
-    // ---------- Tip ----------
-
-    public static final By TIP_HEADER =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Tip to Your Delivery Driver' AND accessible == 1"
-            );
-
-    // ---------- Charge breakdown ----------
-
-    /**
-     * Charge label: "Subtotal", "Delivery Fee", "Tax", "Service Fee",
-     * "Tip", "Total".
-     */
-    public static By chargeLabel(String label) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "type == 'XCUIElementTypeStaticText' AND name == '" + label + "' AND accessible == 1"
-        );
-    }
-
-    /**
-     * Every charge amount, in render order: subtotal, delivery fee, tax,
-     * service fee, tip, total.
-     *
-     * The type filter excludes the tip chips ("$5"…), and accessible == 1
-     * keeps each amount from being counted twice — the app nests every
-     * StaticText inside an identically named wrapper.
-     *
-     * These rows sit below the fold, so they report visible == false until
-     * the page is scrolled. Read them by attribute rather than requiring
-     * visibility.
-     */
-    /**
-     * Every row label of the summary — "Subtotal", "Delivery", "Estimated
-     * tax", "Service fee", "Small cart fee", "Tip", "Total" — so the
-     * amounts can be paired with them by line. Amounts alone are no longer
-     * enough: the store group above the summary prints "$14.99 delivery"
-     * and each item its own price, all of them StaticTexts starting with
-     * "$".
-     *
-     * Small cart fee: confirmed live, sits between Service fee and Tip.
-     * Charged on a small order — this suite's own $16.00-subtotal single
-     * item always carries it — and was missing from this list entirely,
-     * which silently dropped it from every reconciliation sum while Total
-     * kept including it: a checkout with $77.10 as its Total summed its
-     * named rows to $67.11, short by exactly this fee.
-     */
-    public static final By ALL_CHARGE_LABELS =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND accessible == 1"
-                            + " AND name IN {'Subtotal', 'Delivery', 'Estimated tax', 'Service fee',"
-                            + " 'Small cart fee', 'Tip', 'Total'}"
-            );
-
-    public static final By ALL_CHARGE_AMOUNTS =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH '$' AND accessible == 1"
-            );
+    public static final String ADDRESS_ROW_PREFIX = "Deliver to.";
 
     // ---------- Place order ----------
 
@@ -177,19 +111,22 @@ public final class CheckoutPageLocators {
      * screen opens — and "Get it Today" once Priority is picked. Matching
      * only one of the two makes the screen look like it never loaded.
      */
+    public static final String GET_IT_PREFIX = "Get it";
+    public static final String SCHEDULE_DELIVERY_PREFIX = "Schedule Delivery";
+
     public static final By PLACE_ORDER_BUTTON =
             AppiumBy.iOSNsPredicateString(
-                    "(name BEGINSWITH 'Get it' OR name BEGINSWITH 'Schedule Delivery')"
+                    "(name BEGINSWITH '" + GET_IT_PREFIX + "' OR name BEGINSWITH '" + SCHEDULE_DELIVERY_PREFIX + "')"
                             + " AND accessible == 1 AND visible == 1"
             );
 
     /**
-     * The Priority flavour of that button, for asserting the copy actually
-     * flips when the speed changes.
+     * The Priority flavour of that button, for waiting on the copy to
+     * actually flip when the speed changes.
      */
     public static final By GET_IT_TODAY_BUTTON =
             AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Get it' AND accessible == 1 AND visible == 1"
+                    "name BEGINSWITH '" + GET_IT_PREFIX + "' AND accessible == 1 AND visible == 1"
             );
 
 }

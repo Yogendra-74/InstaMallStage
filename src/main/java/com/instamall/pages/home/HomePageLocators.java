@@ -22,14 +22,15 @@ public final class HomePageLocators {
     // ---------- Header ----------
 
     /**
-     * The location chip. Its name is "Deliver to " plus the current value —
-     * "Deliver to Z9 VENTURES" once an address is picked, "Deliver to
-     * Select location" while none is. Tapping it opens the "Deliver to"
-     * address sheet.
+     * The location chip. On the current build its name is "Delivery "
+     * plus the chosen address, which it repeats — "Delivery Automation
+     * Address Automation Address" — where an earlier build read "Deliver
+     * to AUTOMATION ADDRESS". Tapping it opens the "Deliver to" address
+     * sheet either way.
      */
     public static final By LOCATION_SELECTOR =
             AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeOther' AND name BEGINSWITH 'Deliver to ' AND accessible == 1"
+                    "type == 'XCUIElementTypeOther' AND name BEGINSWITH 'Delivery ' AND accessible == 1"
             );
 
     /**
@@ -40,15 +41,22 @@ public final class HomePageLocators {
     public static By selectedLocation(String locationName) {
 
         return AppiumBy.iOSNsPredicateString(
-                "name BEGINSWITH[c] 'Deliver to " + locationName + "' AND accessible == 1"
+                "name BEGINSWITH[c] 'Delivery " + locationName + "' AND accessible == 1"
         );
     }
 
     // ---------- Body ----------
 
-    public static final By SEARCH_INSTAMALL =
+    /**
+     * The one thing only Home shows: its delivery chip, which reads
+     * "Delivery <address>" once an address is set and "Select location"
+     * before one is. Confirmed live that neither is on the store screen,
+     * so this is what tells Home apart.
+     */
+    public static final By HOME_HEADER =
             AppiumBy.iOSNsPredicateString(
-                    "name == 'Search designers, stores and pieces' AND accessible == 1"
+                    "(name BEGINSWITH 'Delivery ' OR name == 'Select location')"
+                            + " AND accessible == 1"
             );
 
     /**
@@ -150,7 +158,8 @@ public final class HomePageLocators {
                     "(name == 'Bag' OR name ENDSWITH ' Bag') AND accessible == 1"
             );
 
+    // Named "Profile" on the current build, "Account" on an earlier one.
     public static final By TAB_PROFILE =
-            AppiumBy.accessibilityId("Account");
+            AppiumBy.accessibilityId("Profile");
 
 }

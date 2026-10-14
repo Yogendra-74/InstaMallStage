@@ -1,10 +1,8 @@
 package com.instamall.pages.payment;
 
 import com.instamall.base.BasePage;
-import com.instamall.utils.CurrencyUtils;
 import com.instamall.waits.WaitUtils;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 
 public class PaymentSheet extends BasePage {
@@ -22,11 +20,6 @@ public class PaymentSheet extends BasePage {
      * Final payable amount, read off the pay button ("Pay $962.49").
      * This is the number the order confirmation must agree with.
      */
-    public BigDecimal getPayableAmount() {
-
-        return CurrencyUtils.parse(getText(PaymentSheetLocators.PAY_BUTTON));
-    }
-
     public PaymentSheet selectSavedCard(String lastFourDigits) {
 
         click(PaymentSheetLocators.savedCard(lastFourDigits));

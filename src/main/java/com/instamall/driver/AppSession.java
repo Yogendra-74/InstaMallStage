@@ -2,6 +2,7 @@ package com.instamall.driver;
 
 import com.instamall.config.ConfigReader;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -131,24 +132,46 @@ public final class AppSession {
     }
 
     /**
+     * How long to wait for "mobile: clearApp" to actually finish putting
+     * the app back on the device before giving up and moving on anyway.
+     */
+    private static final Duration REINSTALL_TIMEOUT = Duration.ofSeconds(40);
+
+    /**
      * Wipes the app's data container (keychain-backed auth tokens
      * included) so the next launch starts at onboarding.
+     *
+     * "mobile: clearApp" is not actually a data wipe on iOS — confirmed
+     * against the simulator's own system log — it is a real uninstall
+     * followed by a reinstall from the "app" capability's own path, and
+     * it returns before that finishes: the OS keeps working through it
+     * asynchronously for a further ~20s afterward (uninstall, then
+     * reinstall, each with its own cascade of system-service
+     * notifications). A caller that immediately terminates/activates the
+     * app the moment this method returns can land mid-reinstall, which
+     * was seen live to corrupt the next launch — a black screen that
+     * eventually recovers onto onboarding rather than wherever the test
+     * actually left off, with nothing past that point ever appearing.
+     * Polling isAppInstalled() here, rather than trusting the call to
+     * have finished when it returns, is what actually waits out that
+     * window.
      *
      * Never throws: if the driver rejects the command, the caller gets a
      * warning and continues — tests handle the already-signed-in case on
      * their own.
      *
-     * @return true if the data was cleared.
+     * @return true if the data was cleared and the app confirmed
+     *         reinstalled before the timeout; false on either failure.
      */
     public static boolean clearAppData() {
+
+        String bundleId = ConfigReader.get("bundleId");
 
         try {
 
             DriverManager.getDriver().executeScript(
                     "mobile: clearApp",
-                    Map.of("bundleId", ConfigReader.get("bundleId")));
-
-            return true;
+                    Map.of("bundleId", bundleId));
 
         } catch (Exception exception) {
 
@@ -158,6 +181,40 @@ public final class AppSession {
 
             return false;
         }
+
+        long deadline = System.currentTimeMillis() + REINSTALL_TIMEOUT.toMillis();
+
+        while (System.currentTimeMillis() < deadline) {
+
+            try {
+
+                if (DriverManager.getDriver().isAppInstalled(bundleId)) {
+
+                    return true;
+                }
+
+            } catch (Exception ignoredAndRetried) {
+
+                // Transient — the driver/WDA proxy itself can be mid-churn
+                // while the OS is still tearing the app down, same window
+                // this method exists to wait out.
+            }
+
+            try {
+
+                Thread.sleep(500);
+
+            } catch (InterruptedException interrupted) {
+
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        System.out.println(">>> " + bundleId + " did not confirm reinstalled within "
+                + REINSTALL_TIMEOUT.toSeconds() + "s — continuing anyway.");
+
+        return false;
     }
 
 }

@@ -1,10 +1,8 @@
 package com.instamall.pages.orders;
 
 import com.instamall.base.BasePage;
-import com.instamall.utils.CurrencyUtils;
 import com.instamall.waits.WaitUtils;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 
 public class OrderConfirmationPage extends BasePage {
@@ -30,15 +28,6 @@ public class OrderConfirmationPage extends BasePage {
         String title = getText(OrderConfirmationPageLocators.ORDER_ID);
 
         return title.replaceFirst("(?i)^order:?\\s*", "").trim();
-    }
-
-    /**
-     * The total from the bottom bar. Scoped to that bar so the ordered
-     * item's line price cannot be read instead.
-     */
-    public BigDecimal getTotal() {
-
-        return CurrencyUtils.parse(getText(OrderConfirmationPageLocators.TOTAL_AMOUNT));
     }
 
 }

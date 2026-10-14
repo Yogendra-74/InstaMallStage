@@ -39,6 +39,27 @@ public class EmailLoginPage extends BasePage {
 
     public EmailLoginPage clickNext() {
 
+        submitCredentials();
+
+        // A fresh sign in is followed by the Save Password alert and the
+        // two AI consent sheets, all of which sit on top of home — and the
+        // sign in itself is slow, so this waits for home to be clear.
+        ConsentPrompts.acceptAfterSignIn(HomePageLocators.TAB_HOME);
+
+        return this;
+    }
+
+    /**
+     * Submits the sign-in form and returns immediately — none of what
+     * can follow (Save Password alert, Notification and Location
+     * permission alerts in no fixed order, up to three consent sheets)
+     * is handled here, unlike {@link #clickNext()}. For a caller that
+     * needs to run its own logic in between submitting and whatever
+     * comes after — e.g. a permissions loop of its own — before
+     * finishing with {@link ConsentPrompts#acceptAfterSignIn}.
+     */
+    public EmailLoginPage submitCredentials() {
+
         // The keyboard is still up from the password field and covers
         // both the consent box and Continue, so put it away first.
         dismissKeyboard();
@@ -50,11 +71,6 @@ public class EmailLoginPage extends BasePage {
         WaitUtils.waitForEnabled(EmailLoginPageLocators.NEXT_BUTTON);
 
         click(EmailLoginPageLocators.NEXT_BUTTON);
-
-        // A fresh sign in is followed by the Save Password alert and the
-        // two AI consent sheets, all of which sit on top of home — and the
-        // sign in itself is slow, so this waits for home to be clear.
-        ConsentPrompts.acceptAfterSignIn(HomePageLocators.TAB_HOME);
 
         return this;
     }
@@ -70,7 +86,10 @@ public class EmailLoginPage extends BasePage {
 
         if (!LoginPage.isChecked(checkbox)) {
 
-            checkbox.click();
+            // A plain click() was confirmed live to report success
+            // without ever actually toggling this control — see
+            // BasePage.pressAndRelease()'s own doc comment.
+            pressAndRelease(EmailLoginPageLocators.CONSENT_CHECKBOX);
         }
 
         return this;

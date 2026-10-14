@@ -27,6 +27,16 @@ public class OnboardingPageValidator extends BasePage {
         return isDisplayed(OnboardingPageLocators.SIGNUP_BUTTON);
     }
 
+    /**
+     * On screen at this instant, without waiting — same shape as
+     * {@link #isLoginButtonDisplayedNow()}, for a caller polling for
+     * "Make it personal" itself rather than the sign-in link beside it.
+     */
+    public boolean isSignUpButtonDisplayedNow() {
+
+        return isDisplayedNow(OnboardingPageLocators.SIGNUP_BUTTON);
+    }
+
     public boolean isExploreAsGuestDisplayed() {
 
         return isDisplayed(OnboardingPageLocators.EXPLORE_AS_GUEST);

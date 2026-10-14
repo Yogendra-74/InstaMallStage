@@ -18,13 +18,16 @@ public final class HeaderLocators {
      * It has no name, label or id, so it is matched by being the only
      * unnamed accessible Other of its size — a 12x15 glyph, the same on
      * every screen that has one (login, store, product, bag, checkout,
-     * profile pages). An accessibility id from the app team would replace
-     * this.
+     * profile pages). Its glyph is 12x15 on most screens and 11x15 on
+     * checkout (confirmed live), hence the small size range, pinned to
+     * the top-left corner. An accessibility id from the app team would
+     * replace this.
      */
     public static final By BACK_CHEVRON =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeOther' AND accessible == 1 AND name == nil"
-                            + " AND rect.width == 12 AND rect.height == 15"
+                            + " AND rect.x < 40 AND rect.y < 110"
+                            + " AND rect.width BETWEEN {10, 14} AND rect.height BETWEEN {14, 16}"
             );
 
 }

@@ -55,6 +55,23 @@ public class ShopperLoginPage extends BasePage {
         return this;
     }
 
+    /**
+     * Just the tap on "Log in" — no prompt handling and no wait for the
+     * dashboard, for a flow that answers each permission alert that
+     * follows as its own explicit step (Single_Order_Complete's Phase 2:
+     * confirmed live, the Notifications alert is the first thing up
+     * after this tap, with "Don't Allow" and "Allow" as its buttons).
+     * {@link #clickLogIn()} is the all-in-one form the other tests use.
+     */
+    public ShopperLoginPage tapLogIn() {
+
+        WaitUtils.waitForEnabled(ShopperLoginPageLocators.LOG_IN_BUTTON);
+
+        click(ShopperLoginPageLocators.LOG_IN_BUTTON);
+
+        return this;
+    }
+
     public ShopperLoginPage clickLogIn() {
 
         WaitUtils.waitForEnabled(ShopperLoginPageLocators.LOG_IN_BUTTON);

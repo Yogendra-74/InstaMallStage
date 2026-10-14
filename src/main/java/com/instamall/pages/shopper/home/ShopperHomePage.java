@@ -83,6 +83,34 @@ public class ShopperHomePage extends BasePage {
     }
 
     /**
+     * Taps "VIEW ORDER" on the first listing — the ON SHIFT case, where
+     * a new order is waiting to be opened. Confirmed live
+     * (Single_Order_Complete Phase 2, step by step): the tap lands on
+     * the button at the card's bottom and the order detail opens.
+     */
+    public ShopperHomePage tapViewOrderOnFirstCard() {
+
+        tapCardCta(ShopperHomePageLocators.VIEW_ORDER_CARD);
+
+        return this;
+    }
+
+    /**
+     * Taps "IN PROGRESS" on the first listing — the IN ORDER case, where
+     * the shopper is already inside a run and the card carries that
+     * label instead of "VIEW ORDER". Same bottom-biased tap, since the
+     * card's actionable area is laid out the same way. Not yet driven
+     * live in a step-by-step session: the account was ON SHIFT when
+     * this was written.
+     */
+    public ShopperHomePage tapInProgressOnFirstCard() {
+
+        tapCardCta(ShopperHomePageLocators.IN_PROGRESS_CARD);
+
+        return this;
+    }
+
+    /**
      * Taps "START HANDOFF" on the one card ready for it — see
      * ShopperHomePageLocators.READY_FOR_HANDOFF_CARD's own doc comment
      * for why this is not just another orderCardContaining() call.

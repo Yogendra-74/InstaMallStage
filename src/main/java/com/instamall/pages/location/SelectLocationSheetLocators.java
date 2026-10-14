@@ -24,11 +24,6 @@ public final class SelectLocationSheetLocators {
                     "type == 'XCUIElementTypeStaticText' AND name == 'Where are we delivering?' AND accessible == 1"
             );
 
-    // The only text field on the sheet; its placeholder,
-    // "Search for an address", shows up as the value.
-    public static final By SEARCH_ADDRESS_TEXTBOX =
-            AppiumBy.iOSClassChain("**/XCUIElementTypeTextField");
-
     // ---------- Quick slots ----------
 
     // Each slot's name is its label plus what it holds: "Home Set up"

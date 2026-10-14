@@ -141,4 +141,13 @@ public abstract class BasePage {
         return WaitUtils.waitUntil(condition);
     }
 
+    /**
+     * See ElementActions.pressAndRelease()'s own doc comment for why
+     * this exists alongside the plain click() above.
+     */
+    protected void pressAndRelease(By locator) {
+
+        ElementActions.pressAndRelease(locator);
+    }
+
 }

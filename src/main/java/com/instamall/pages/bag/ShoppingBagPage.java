@@ -2,14 +2,11 @@ package com.instamall.pages.bag;
 
 import com.instamall.base.BasePage;
 import com.instamall.driver.DriverManager;
-import com.instamall.utils.CurrencyUtils;
-import com.instamall.waits.WaitUtils;
-import org.openqa.selenium.By;
+import com.instamall.utils.ScreenSnapshot;
+import com.instamall.utils.ScreenSnapshot.Item;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -31,6 +28,22 @@ public class ShoppingBagPage extends BasePage {
     private static final int ROW_HEIGHT = 200;
 
     /**
+     * How this build names the pieces of one bag row: every element
+     * carries the same "bag_item_&lt;id&gt;_" prefix and a suffix saying
+     * what it is, with the words a shopper reads in its label. Grouping
+     * on that id is what rows() does, where it used to line pieces up by
+     * their position on screen.
+     */
+    private static final String ITEM_PREFIX = "bag_item_";
+    private static final String NAME_SUFFIX = "_name_text";
+    private static final String VARIANT_SUFFIX = "_variant_button";
+    private static final String REMOVE_SUFFIX = "_remove_button";
+
+    // How the variant line spells itself: "Size: 43 Color: Chino Grey".
+    private static final String SIZE_PREFIX = "Size:";
+    private static final String COLOR_PREFIX = "Color:";
+
+    /**
      * One item as the bag lays it out: the pieces are separate siblings
      * in the list, so they are gathered here by position.
      */
@@ -39,29 +52,35 @@ public class ShoppingBagPage extends BasePage {
         final String product;
         final String variant;
         final int top;
-        final WebElement removeButton;
-        final Optional<String> price;
+        final int removeButtonY;
 
-        Row(String product, String variant, int top,
-            WebElement removeButton, Optional<String> price) {
+        Row(String product, String variant, int top, int removeButtonY) {
 
             this.product = product;
             this.variant = variant;
             this.top = top;
-            this.removeButton = removeButton;
-            this.price = price;
+            this.removeButtonY = removeButtonY;
         }
 
         /**
-         * The size, read off the end of "Vineyard Red · M". A one-size
-         * product's line is just the colour, which the product page calls
+         * The size out of the variant line. This build writes it as
+         * "Size: 43 Color: Chino Grey"; a product with nothing to choose
+         * carries no "Size:" part at all, which the product page calls
          * "One Size".
          */
         String size() {
 
-            int dot = variant.lastIndexOf(" · ");
+            int start = variant.indexOf(SIZE_PREFIX);
 
-            return dot < 0 ? "One Size" : variant.substring(dot + 3).trim();
+            if (start < 0) {
+
+                return "One Size";
+            }
+
+            String afterSize = variant.substring(start + SIZE_PREFIX.length());
+            int colour = afterSize.indexOf(COLOR_PREFIX);
+
+            return (colour < 0 ? afterSize : afterSize.substring(0, colour)).trim();
         }
 
         boolean matches(String productName, String size) {
@@ -85,43 +104,6 @@ public class ShoppingBagPage extends BasePage {
         waitForVisibility(ShoppingBagPageLocators.CHECKOUT_BUTTON);
 
         return this;
-    }
-
-    /**
-     * The bag's Subtotal — items only, before delivery, tax and fees. It
-     * used to be printed on the Checkout button; now it is the first row
-     * of the summary, and the amount beside the label is the one on the
-     * same line.
-     */
-    public BigDecimal getCheckoutAmount() {
-
-        // Presence, not visibility: with more than one store group the
-        // summary sits below the fold, and the amount is read by attribute.
-        Rectangle label = WaitUtils.waitForPresence(ShoppingBagPageLocators.SUBTOTAL_LABEL).getRect();
-
-        return amounts().stream()
-                .filter(amount -> Math.abs(amount.getRect().getY() - label.getY()) < 5)
-                .findFirst()
-                .map(amount -> CurrencyUtils.parse(amount.getAttribute("name")))
-                .orElseThrow(() -> new NoSuchElementException(
-                        "No amount on the Subtotal line of the bag"));
-    }
-
-    /**
-     * Price of one variant, read off its own row.
-     *
-     * Size narrows the match without being required — a store group holds
-     * everything bought from that store, so one product can appear under
-     * several sizes.
-     */
-    public BigDecimal getItemPrice(String productName, String size) {
-
-        Row row = rowFor(productName, size)
-                .orElseThrow(() -> new NoSuchElementException(
-                        "No bag row for \"" + productName + "\" in size " + size));
-
-        return CurrencyUtils.parse(row.price.orElseThrow(() -> new NoSuchElementException(
-                "The bag row for \"" + productName + "\" carries no price")));
     }
 
     /**
@@ -204,8 +186,17 @@ public class ShoppingBagPage extends BasePage {
             Row row = rows.get(0);
             int before = rows.size();
 
-            scrollIntoView(row.removeButton);
-            row.removeButton.click();
+            // The row was read off a snapshot, so the button is looked up
+            // now, right before it is tapped: the one Remove on its line.
+            WebElement removeButton = DriverManager.getDriver()
+                    .findElements(ShoppingBagPageLocators.REMOVE_BUTTON).stream()
+                    .filter(button -> Math.abs(button.getRect().getY() - row.removeButtonY) < 8)
+                    .findFirst()
+                    .orElseThrow(() -> new NoSuchElementException(
+                            "No Remove button on the line of " + row));
+
+            scrollIntoView(removeButton);
+            removeButton.click();
 
             // Wait on the count, not on a fixed pause: if the tap missed
             // this is what says so, instead of the next removal silently
@@ -223,18 +214,36 @@ public class ShoppingBagPage extends BasePage {
     /**
      * Taps the checkout button of the store group holding one variant —
      * the first "Review delivery &amp; checkout" below its row.
+     *
+     * The row's position and the button below it come from one snapshot;
+     * the only per-element call left is finding the button to tap, by
+     * its position. Confirmed in the Appium log: this screen used to
+     * spend ~20s between "VIEW BAG" and this tap on about eighty
+     * rect/name round trips — rows() built every row of the bag twice
+     * over, one element attribute at a time — before the tap ever
+     * landed. See ScreenSnapshot.
      */
     public ShoppingBagPage clickCheckoutFor(String productName, String size) {
 
-        Row row = rowFor(productName, size)
+        ScreenSnapshot screen = ScreenSnapshot.capture();
+
+        Row row = rowFor(screen, productName, size)
                 .orElseThrow(() -> new NoSuchElementException(
                         "No bag row for \"" + productName + "\" in size " + size));
 
-        WebElement button = firstBelow(
-                DriverManager.getDriver().findElements(ShoppingBagPageLocators.CHECKOUT_BUTTON),
-                row.top)
+        Item checkout = screen.where(item -> item.named(ShoppingBagPageLocators.CHECKOUT_BUTTON_TEXT)
+                        && item.y > row.top)
+                .stream()
+                .min(Comparator.comparingInt(item -> item.y))
                 .orElseThrow(() -> new NoSuchElementException(
                         "No checkout button under the store group holding \"" + productName + "\""));
+
+        WebElement button = DriverManager.getDriver()
+                .findElements(ShoppingBagPageLocators.CHECKOUT_BUTTON).stream()
+                .filter(candidate -> Math.abs(candidate.getRect().getY() - checkout.y) < 8)
+                .findFirst()
+                .orElseThrow(() -> new NoSuchElementException(
+                        "The checkout button under \"" + productName + "\" moved before it could be tapped"));
 
         scrollIntoView(button);
         button.click();
@@ -257,67 +266,61 @@ public class ShoppingBagPage extends BasePage {
 
     private Optional<Row> rowFor(String productName, String size) {
 
-        return rows().stream()
+        return rowFor(ScreenSnapshot.capture(), productName, size);
+    }
+
+    private Optional<Row> rowFor(ScreenSnapshot screen, String productName, String size) {
+
+        return rows(screen).stream()
                 .filter(row -> row.matches(productName, size))
                 .findFirst();
     }
 
     /**
-     * Every item on screen, in list order.
+     * Every item on screen, in list order, read off one snapshot.
      *
-     * "Save for later" is the anchor: every row has exactly one, in the
-     * item column. Above it in that column sit, in order, the title (a
-     * text), the variant line (a Button — "Vineyard Red · M", or just the
-     * colour on a one-size product) and the price; Remove is the button
-     * on the same line as the anchor. Store-group headers are Buttons too,
-     * but sit in the margin column and so are never taken for a variant.
+     * Each row's pieces share a "bag_item_&lt;id&gt;_" prefix in their
+     * accessible name, so a row is assembled by that id rather than by
+     * lining elements up in the same column — which is what this did
+     * before the app put test ids on them, and what broke when the names
+     * a shopper reads moved from name to label.
      */
-    private List<Row> rows() {
-
-        List<WebElement> texts = elements(ShoppingBagPageLocators.ANY_TEXT);
-        List<WebElement> buttons = elements(ShoppingBagPageLocators.ANY_ITEM_BUTTON);
-        List<WebElement> amounts = amounts();
-        List<WebElement> removes = elements(ShoppingBagPageLocators.REMOVE_BUTTON);
+    private List<Row> rows(ScreenSnapshot screen) {
 
         List<Row> rows = new ArrayList<>();
 
-        for (WebElement anchor : elements(ShoppingBagPageLocators.SAVE_FOR_LATER_BUTTON)) {
+        for (Item title : screen.where(item -> item.name != null
+                && item.name.startsWith(ITEM_PREFIX)
+                && item.name.endsWith(NAME_SUFFIX))) {
 
-            Rectangle at = anchor.getRect();
+            String id = title.name.substring(ITEM_PREFIX.length(),
+                    title.name.length() - NAME_SUFFIX.length());
 
-            Optional<WebElement> variant = buttons.stream()
-                    .filter(button -> sameColumn(button, at) && button.getRect().getY() < at.getY())
-                    .max(Comparator.comparingInt(button -> button.getRect().getY()));
+            Optional<Item> variant = pieceOf(screen, id, VARIANT_SUFFIX);
+            Optional<Item> remove = pieceOf(screen, id, REMOVE_SUFFIX);
 
-            Optional<WebElement> title = variant.flatMap(line -> texts.stream()
-                    .filter(text -> sameColumn(text, at)
-                            && text.getRect().getY() < line.getRect().getY())
-                    .filter(text -> !String.valueOf(text.getAttribute("name")).startsWith("$"))
-                    .max(Comparator.comparingInt(text -> text.getRect().getY())));
-
-            Optional<WebElement> remove = removes.stream()
-                    .filter(button -> Math.abs(button.getRect().getY() - at.getY()) < 8)
-                    .findFirst();
-
-            if (variant.isEmpty() || title.isEmpty() || remove.isEmpty()) {
+            if (variant.isEmpty() || remove.isEmpty()) {
 
                 continue;
             }
 
-            int variantY = variant.get().getRect().getY();
-
-            Optional<String> price = amounts.stream()
-                    .filter(amount -> sameColumn(amount, at)
-                            && amount.getRect().getY() > variantY
-                            && amount.getRect().getY() < at.getY())
-                    .min(Comparator.comparingInt(amount -> amount.getRect().getY()))
-                    .map(amount -> amount.getAttribute("name"));
-
-            rows.add(new Row(title.get().getAttribute("name"), variant.get().getAttribute("name"),
-                    title.get().getRect().getY(), remove.get(), price));
+            rows.add(new Row(title.label, variant.get().label,
+                    title.y, remove.get().y));
         }
 
+        rows.sort(Comparator.comparingInt(row -> row.top));
+
         return rows;
+    }
+
+    /**
+     * One named piece of the row with this id.
+     */
+    private Optional<Item> pieceOf(ScreenSnapshot screen, String id, String suffix) {
+
+        return screen.where(item -> (ITEM_PREFIX + id + suffix).equals(item.name))
+                .stream()
+                .findFirst();
     }
 
     /**
@@ -325,7 +328,10 @@ public class ShoppingBagPage extends BasePage {
      */
     private List<Row> outOfStockRows() {
 
-        List<WebElement> messages = elements(ShoppingBagPageLocators.OUT_OF_STOCK_MESSAGE);
+        ScreenSnapshot screen = ScreenSnapshot.capture();
+
+        List<Item> messages = screen.where(item -> item.isStaticText()
+                && item.nameContainsIgnoreCase(ShoppingBagPageLocators.OUT_OF_STOCK_TEXT));
 
         if (messages.isEmpty()) {
 
@@ -334,11 +340,10 @@ public class ShoppingBagPage extends BasePage {
 
         List<Row> flagged = new ArrayList<>();
 
-        for (Row row : rows()) {
+        for (Row row : rows(screen)) {
 
             boolean marked = messages.stream()
-                    .map(message -> message.getRect().getY())
-                    .anyMatch(y -> y >= row.top && y < row.top + ROW_HEIGHT);
+                    .anyMatch(message -> message.y >= row.top && message.y < row.top + ROW_HEIGHT);
 
             if (marked) {
 
@@ -347,28 +352,6 @@ public class ShoppingBagPage extends BasePage {
         }
 
         return flagged;
-    }
-
-    private List<WebElement> amounts() {
-
-        return elements(ShoppingBagPageLocators.ANY_AMOUNT);
-    }
-
-    private static List<WebElement> elements(By locator) {
-
-        return DriverManager.getDriver().findElements(locator);
-    }
-
-    private static boolean sameColumn(WebElement element, Rectangle reference) {
-
-        return Math.abs(element.getRect().getX() - reference.getX()) < 5;
-    }
-
-    private static Optional<WebElement> firstBelow(List<WebElement> candidates, int y) {
-
-        return candidates.stream()
-                .filter(candidate -> candidate.getRect().getY() > y)
-                .min(Comparator.comparingInt(candidate -> candidate.getRect().getY()));
     }
 
 }

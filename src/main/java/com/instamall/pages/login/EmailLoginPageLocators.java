@@ -46,10 +46,18 @@ public final class EmailLoginPageLocators {
      * The screen headline. Tapping it is how the keyboard is put away:
      * the app offers no Done key, WDA's hideKeyboard cannot dismiss it,
      * and while it is up it covers the consent box and Continue.
+     *
+     * This same screen is reached from two different onboarding entry
+     * points — OnboardingPageLocators.LOGIN_BUTTON ("Already have an
+     * account? Sign in") and SIGNUP_BUTTON ("Make it personal") — and
+     * the headline reads differently depending on which one: "Your
+     * personal edit awaits." for sign-in, "Your personal edit starts
+     * here." for sign-up, confirmed live on each. Matched by the shared
+     * prefix rather than either exact string.
      */
     public static final By HEADLINE =
             AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeStaticText' AND name == 'Your personal edit awaits.' AND accessible == 1"
+                    "type == 'XCUIElementTypeStaticText' AND name BEGINSWITH 'Your personal edit' AND accessible == 1"
             );
 
     public static final By CONTINUE_WITH_PHONE =

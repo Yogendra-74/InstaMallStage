@@ -7,74 +7,27 @@
         <listener class-name="com.instamall.listeners.TestListener"/>
     </listeners>
 
-    <test name="Onboarding">
-        <classes>
-            <class name="com.instamall.tests.OnboardingTest"/>
-        </classes>
-    </test>
-
-    <test name="Login">
-        <classes>
-            <class name="com.instamall.tests.LoginTest"/>
-        </classes>
-    </test>
-
     <!--
-        Everything below signs itself in (clearing app data first, or
-        checking the onboarding screen before logging in), so it can
-        follow the signed-out screen tests above in any order.
+        The full order lifecycle, one phase per test method, run in
+        series in lifecycle order (priority 1..6) and stopping at the
+        first failure: Customer app places an order, the Shopper app
+        accepts it through receipt submission, the Delivery Portal
+        assigns a driver and marks pickup, the Shopper app hands off,
+        the Portal dispatches through to Delivered, and the Customer app
+        confirms the order as Delivered. Runs first, against a clean
+        simulator state. Any single phase can also be run on its own:
+        mvn test -Dtest='Single_Order_Complete#phase2*'
     -->
-    <test name="Profile">
+    <test name="SingleOrderLifecycle">
         <classes>
-            <class name="com.instamall.tests.ProfileTest"/>
-        </classes>
-    </test>
-
-    <test name="ProfileDiscovery">
-        <classes>
-            <class name="com.instamall.tests.ProfileDiscoveryTest"/>
-        </classes>
-    </test>
-
-    <test name="ProfileDiscoveryPhase2">
-        <classes>
-            <class name="com.instamall.tests.ProfileDiscoveryPhase2Test"/>
-        </classes>
-    </test>
-
-    <test name="ProfileDiscoveryPhase3">
-        <classes>
-            <class name="com.instamall.tests.ProfileDiscoveryPhase3Test"/>
-        </classes>
-    </test>
-
-    <test name="WishlistToBag">
-        <classes>
-            <class name="com.instamall.tests.WishlistToBagTest"/>
+            <class name="com.instamall.tests.model_02_rev.Single_Order_Complete"/>
         </classes>
     </test>
 
     <!--
-        Runs last on purpose: it signs in, so it leaves the app with an
-        active session. The screen tests above expect the signed-out
-        onboarding screen on launch.
-    -->
-    <test name="EndToEnd">
-        <classes>
-            <class name="com.instamall.tests.EndToEndOrderTest"/>
-        </classes>
-    </test>
-
-    <test name="SearchAndPlaceOrder">
-        <classes>
-            <class name="com.instamall.tests.SearchAndPlaceOrderTest"/>
-        </classes>
-    </test>
-
-    <!--
-        A different app (the Shopper app, installed on the same
-        simulator) — unaffected by the Customer app session state left
-        above, since ShopperBaseTest relaunches by its own bundle id.
+        Shopper app only (installed on the same simulator) — each class
+        starts its own session by bundle id, so it is unaffected by
+        whatever the lifecycle above left in the foreground.
     -->
     <test name="ShopperLogin">
         <classes>

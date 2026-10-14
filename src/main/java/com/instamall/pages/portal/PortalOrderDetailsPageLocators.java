@@ -23,9 +23,16 @@ public final class PortalOrderDetailsPageLocators {
      * The pill next to "Order Summary" — read this rather than assuming
      * a fixed value; seen as "Dispatched" for the order this was mapped
      * against, matching the Active tab's own card.
+     *
+     * Confirmed live against the current markup: an h3.card-header-title
+     * holding a div (" Order Summary " after an icon span) and a
+     * ds-delivery-status-badge wrapping the span.badge with the status.
+     * The previous XPath keyed on contains(text(), 'Order Summary') and
+     * never matched here — XPath's contains() only looks at the FIRST
+     * text node, which in this header is the whitespace before the icon.
      */
     public static final By ORDER_SUMMARY_STATUS_BADGE =
-            By.xpath("//*[contains(@class,'card-header')][.//*[contains(text(),'Order Summary')]]//*[contains(@class,'badge') or contains(@class,'ds-btn')]");
+            By.cssSelector(".card-header-title ds-delivery-status-badge span.badge");
 
     public static final By ORDER_ID_VALUE =
             By.xpath("//*[normalize-space(text())='Order ID']/following-sibling::*[1]");
@@ -75,11 +82,18 @@ public final class PortalOrderDetailsPageLocators {
      * narrow the list, then use this to find whatever it actually
      * rendered without needing to already know its exact casing.
      */
+    /**
+     * The option whose whole text is the status, compared without regard
+     * to case or surrounding whitespace. Whole text rather than a
+     * contains(): confirmed live, filtering the list on "Assigned" leaves
+     * two options, "Assigned" and "Unassigned", and a contains() match
+     * would take whichever came first in the panel.
+     */
     public static By orderStatusOptionContaining(String roughStatusName) {
 
-        return By.xpath("//div[contains(@class,'ng-option')][contains(translate(., "
-                + "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '"
-                + roughStatusName.toLowerCase() + "')]");
+        return By.xpath("//div[contains(@class,'ng-option')][normalize-space(translate(., "
+                + "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')) = '"
+                + roughStatusName.toLowerCase().trim() + "']");
     }
 
     public static final By NOTE_INPUT =

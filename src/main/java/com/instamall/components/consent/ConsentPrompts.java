@@ -1,6 +1,7 @@
 package com.instamall.components.consent;
 
-import com.instamall.components.permissions.PermissionPopupLocators;
+import com.instamall.actions.ElementActions;
+import com.instamall.components.permissions.SystemAlerts;
 import com.instamall.waits.WaitUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
@@ -10,9 +11,19 @@ import java.time.Instant;
 
 /**
  * Clears what stands between a fresh sign in and the app itself: the iOS
- * "Save Password?" alert, the App Tracking Transparency alert, then the
- * "AI & Biometric Consent" and "AI Stylist Consent" sheets, each accepted
- * with Agree & Continue.
+ * "Save Password?" alert, the Notification permission alert, the Location
+ * permission alert, and the "Terms and Conditions" (not every
+ * account/run), "AI & Biometric Consent", and "AI Stylist Consent"
+ * sheets, each sheet accepted with Agree & Continue.
+ *
+ * The two permission alerts in particular are not guaranteed to arrive in
+ * any fixed order — confirmed live to vary run to run — so neither is
+ * checked ahead of the other as "the one that shows first". Each has its
+ * own branch in the loop below, independently gated on whether that one
+ * specific alert is on screen right now; every pass checks both, so
+ * whichever actually shows gets answered regardless of which came first,
+ * and the loop keeps going — through as many passes as it takes, within
+ * its own overall budget — until neither is showing any more.
  *
  * None of them is guaranteed — the alert depends on the simulator's
  * password settings, and an account that has agreed before may not be
@@ -65,24 +76,47 @@ public final class ConsentPrompts {
 
         while (Duration.between(started, Instant.now()).compareTo(LANDED_WITHIN) < 0) {
 
+            // Save Password alert — timing is unpredictable, iOS can
+            // raise it before or after either permission alert below.
             if (WaitUtils.isVisibleNow(ConsentPromptLocators.SAVE_PASSWORD_SAVE)) {
 
-                WaitUtils.waitForClickable(ConsentPromptLocators.SAVE_PASSWORD_SAVE).click();
-                handled++;
-                clearSince = null;
+                // Same race as the Agree & Continue branch below: another
+                // alert/sheet can cover or clear this button between the
+                // isVisibleNow check above and the click landing. Tolerated
+                // the same way — a timeout here is not a failure, the next
+                // pass looks again.
+                try {
+
+                    WaitUtils.waitForClickable(ConsentPromptLocators.SAVE_PASSWORD_SAVE,
+                            CLICK_ATTEMPT_TIMEOUT).click();
+                    handled++;
+                    clearSince = null;
+
+                } catch (TimeoutException notClickableYet) {
+
+                    // Covered or already gone — looked at again next pass.
+                }
+
                 continue;
             }
 
-            // App Tracking Transparency — not covered by any pre-grant
-            // (location and notifications are, via AppSession, but iOS
-            // reserves ATT from that mechanism), so with autoDismissAlerts
-            // off this is a real alert nothing else here answers. Its own
-            // affirmative button is generically named "Allow", same as
-            // location/notifications' — safe to match on here since those
-            // two never reach this loop as real alerts when pre-granted.
-            if (WaitUtils.isVisibleNow(PermissionPopupLocators.ALLOW)) {
+            // Notification and Location permission alerts — order between
+            // them is not assumed (confirmed live to vary run to run).
+            // Each call here is a single no-wait check-and-tap (see
+            // SystemAlerts' own doc comments on these two methods), so
+            // both are tried every single pass of this loop regardless of
+            // which actually shows first.
+            //
+            // Also handled explicitly, in their own loop, by
+            // Single_Order_Complete.phase1_placeOrderFromCustomerApp()
+            // right after sign-in, before this method is reached — by the
+            // time that loop hands off here, via clickNext(), neither
+            // should still be showing. Kept here too since this method is
+            // also called directly by other tests that sign in through
+            // EmailLoginPage without a permissions loop of their own
+            // (ItemPriceDecreaseComplete, ItemPriceIncreaseComplete).
+            if (SystemAlerts.grantNotificationIfShowingNow() || SystemAlerts.grantLocationIfShowingNow()) {
 
-                WaitUtils.waitForClickable(PermissionPopupLocators.ALLOW).click();
                 handled++;
                 clearSince = null;
                 continue;
@@ -93,10 +127,27 @@ public final class ConsentPrompts {
                 // Which sheet this is, so its leaving can be watched by
                 // title: the next sheet slides in under the very same
                 // button name, often before this one has finished going,
-                // so the button itself never reads as gone.
-                By title = WaitUtils.isVisibleNow(ConsentPromptLocators.AI_STYLIST_TITLE)
-                        ? ConsentPromptLocators.AI_STYLIST_TITLE
-                        : ConsentPromptLocators.AI_BIOMETRIC_TITLE;
+                // so the button itself never reads as gone. Checked in the
+                // order the sheets actually arrive — Terms and Conditions
+                // (not every account/run), then AI & Biometric Consent,
+                // then AI Stylist Consent, confirmed live as the full
+                // sequence; AI & Biometric Consent is the fallback default
+                // since it is the one every account sees regardless of
+                // history.
+                By title;
+
+                if (WaitUtils.isVisibleNow(ConsentPromptLocators.TERMS_AND_CONDITIONS_TITLE)) {
+
+                    title = ConsentPromptLocators.TERMS_AND_CONDITIONS_TITLE;
+
+                } else if (WaitUtils.isVisibleNow(ConsentPromptLocators.AI_STYLIST_TITLE)) {
+
+                    title = ConsentPromptLocators.AI_STYLIST_TITLE;
+
+                } else {
+
+                    title = ConsentPromptLocators.AI_BIOMETRIC_TITLE;
+                }
 
                 // Short timeout on purpose: the iOS "Save Password?" alert
                 // can slide in on top of this sheet after the button is
@@ -110,7 +161,12 @@ public final class ConsentPrompts {
                 try {
 
                     WaitUtils.waitForClickable(ConsentPromptLocators.AGREE_AND_CONTINUE,
-                            CLICK_ATTEMPT_TIMEOUT).click();
+                            CLICK_ATTEMPT_TIMEOUT);
+
+                    // A plain click() was confirmed live to report success
+                    // without ever actually dismissing this sheet — see
+                    // ElementActions.pressAndRelease()'s own doc comment.
+                    ElementActions.pressAndRelease(ConsentPromptLocators.AGREE_AND_CONTINUE);
                     handled++;
                     clearSince = null;
 

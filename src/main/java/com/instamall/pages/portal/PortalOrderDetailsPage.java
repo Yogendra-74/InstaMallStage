@@ -1,12 +1,25 @@
 package com.instamall.pages.portal;
 
 import com.instamall.base.PortalBasePage;
+import com.instamall.waits.PortalWaitUtils;
+
+import java.time.Duration;
 
 public class PortalOrderDetailsPage extends PortalBasePage {
 
+    /**
+     * How long the detail page gets to render after its row is clicked.
+     * The sandbox portal is slow right after a login — the History list
+     * alone took 22s in one run — and the plain 20s default was not
+     * enough: confirmed live that the page does open (breadcrumb "View
+     * Order", Order Summary, Order ID) but can take longer than that.
+     */
+    private static final Duration PAGE_LOADS_WITHIN = Duration.ofSeconds(90);
+
     public PortalOrderDetailsPage waitForScreen() {
 
-        waitForVisibility(PortalOrderDetailsPageLocators.PAGE_HEADER);
+        waitForVisibility(PortalOrderDetailsPageLocators.PAGE_HEADER, PAGE_LOADS_WITHIN);
+        waitForVisibility(PortalOrderDetailsPageLocators.ORDER_ID_VALUE, PAGE_LOADS_WITHIN);
 
         return this;
     }
@@ -76,13 +89,36 @@ public class PortalOrderDetailsPage extends PortalBasePage {
      * The whole Override Status flow in one call: open the dropdown,
      * filter to and select the status, enter the note, and submit.
      */
+    /**
+     * How long the Order Summary badge gets to show the new status after
+     * Override is clicked — confirmed live at about 3s for both
+     * "Assigned" and "Driver At PickUp".
+     */
+    private static final Duration OVERRIDE_APPLIES_WITHIN = Duration.ofSeconds(30);
+
     public PortalOrderDetailsPage overrideStatusTo(String roughStatusName, String note) {
 
-        return openStatusDropdown()
+        openStatusDropdown()
                 .filterStatusOptions(roughStatusName)
                 .selectStatusOptionContaining(roughStatusName)
                 .enterOverrideNote(note)
                 .clickOverride();
+
+        // Confirmed live: the form clears itself and the badge flips to
+        // the new status a few seconds later. Waiting on the badge is
+        // what says the override actually applied, rather than that the
+        // button was merely tapped.
+        PortalWaitUtils.waitUntil(driver -> {
+
+            String badge = getStatusBadge();
+
+            return badge != null && badge.toLowerCase().contains(roughStatusName.toLowerCase())
+                    ? badge
+                    : null;
+
+        }, OVERRIDE_APPLIES_WITHIN);
+
+        return this;
     }
 
 }

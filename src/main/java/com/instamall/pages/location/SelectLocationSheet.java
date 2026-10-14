@@ -33,13 +33,6 @@ public class SelectLocationSheet extends BasePage {
         return this;
     }
 
-    public SelectLocationSheet searchAddress(String query) {
-
-        type(SelectLocationSheetLocators.SEARCH_ADDRESS_TEXTBOX, query);
-
-        return this;
-    }
-
     public SelectLocationSheet close() {
 
         click(SelectLocationSheetLocators.CLOSE_BUTTON);

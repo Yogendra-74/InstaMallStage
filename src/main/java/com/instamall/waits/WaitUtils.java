@@ -77,6 +77,36 @@ public final class WaitUtils {
                 .until(ExpectedConditions.invisibilityOfElementLocated(locator));
     }
 
+    /**
+     * Non-throwing counterpart to {@link #waitForInvisibility(By, Duration)}
+     * — for a caller that wants a boolean, not an exception, when the
+     * element is still there once the timeout runs out.
+     *
+     * This is the one to reach for when confirming something has
+     * cleared: it returns the moment the element is gone rather than
+     * always sitting out the full timeout the way {@link #isVisible(By,
+     * Duration)} must whenever the element is already absent —
+     * isVisible() only returns quickly when the thing IS there; its
+     * timeout path is reached precisely when it never shows up at all,
+     * which makes it the wrong primitive for checking "did this go
+     * away" (confirmed live: a 12s timeout used that way cost a flat 12s
+     * on every single successful case it was meant to clear fast).
+     *
+     * @return true if the element was gone (or never there) within
+     *         timeout, false if it was still visible when time ran out
+     */
+    public static boolean isInvisible(By locator, Duration timeout) {
+
+        try {
+
+            return waitForInvisibility(locator, timeout);
+
+        } catch (TimeoutException stillVisible) {
+
+            return false;
+        }
+    }
+
     // ---------- Presence ----------
 
     public static WebElement waitForPresence(By locator) {

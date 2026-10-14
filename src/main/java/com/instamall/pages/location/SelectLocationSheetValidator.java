@@ -9,10 +9,6 @@ public class SelectLocationSheetValidator extends BasePage {
         return isDisplayed(SelectLocationSheetLocators.TITLE);
     }
 
-    public boolean isSearchBoxDisplayed() {
-
-        return isDisplayed(SelectLocationSheetLocators.SEARCH_ADDRESS_TEXTBOX);
-    }
 
     public boolean areQuickSlotsDisplayed() {
 

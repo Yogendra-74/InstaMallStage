@@ -5,7 +5,19 @@ import com.instamall.components.permissions.SystemAlerts;
 import com.instamall.waits.WaitUtils;
 import org.openqa.selenium.WebElement;
 
+import java.time.Duration;
+
 public class LoginPage extends BasePage {
+
+    // The default 20s wait was confirmed live, repeatedly, to be too
+    // short for this specific transition under current staging
+    // conditions — this screen opens off a navigation, not a cold start,
+    // so it was never given the same longer allowance a first paint gets
+    // (see OnboardingPage's own FIRST_PAINT_TIMEOUT), but timed out here
+    // just the same even with the tap itself confirmed landing (pressAndRelease,
+    // no change in outcome). Matches the same order of magnitude as that
+    // first-paint allowance rather than inventing a new one.
+    private static final Duration SCREEN_READY_TIMEOUT = Duration.ofSeconds(45);
 
     /**
      * Reliable "screen is ready" gate. Send code is unique + accessible=true,
@@ -26,7 +38,8 @@ public class LoginPage extends BasePage {
             SystemAlerts.grantAnyShowingNow();
 
             return WaitUtils.isVisibleNow(LoginPageLocators.SEND_OTP_BUTTON) ? Boolean.TRUE : null;
-        });
+
+        }, SCREEN_READY_TIMEOUT);
 
         WaitUtils.waitForPresence(LoginPageLocators.PHONE_NUMBER_TEXTBOX);
 
@@ -72,7 +85,10 @@ public class LoginPage extends BasePage {
 
         if (!isChecked(checkbox)) {
 
-            checkbox.click();
+            // A plain click() was confirmed live to report success
+            // without ever actually toggling this control — see
+            // BasePage.pressAndRelease()'s own doc comment.
+            pressAndRelease(LoginPageLocators.CONSENT_CHECKBOX);
         }
 
         return this;

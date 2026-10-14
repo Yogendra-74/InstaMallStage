@@ -22,30 +22,17 @@ public final class StorePageLocators {
                     "name == 'SHOP BY CATEGORY' AND accessible == 1"
             );
 
-    /**
-     * In-store search box; its name carries the brand, e.g.
-     * "Search Burberry".
-     */
-    public static By searchInStore(String storeName) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "name == 'Search " + storeName + "' AND accessible == 1"
-        );
-    }
 
     /**
-     * The in-store search box without knowing the brand. Its name is
-     * "Search &lt;Brand&gt;", which makes it both the screen's readiness
-     * gate and the place to read the brand from.
+     * The store's name, as the header prints it. Confirmed live: the
+     * header carries two lines, the brand ("Burberry") above the mall it
+     * sits in ("MIAMI DESIGN DISTRICT"), and this is the upper of the
+     * two.
      */
-    // Home's own search box also starts with "Search ", and is still in
-    // the tree for a moment while the store screen pushes in over it —
-    // so it is ruled out by name, or the brand gets read off the wrong
-    // screen.
-    public static final By SEARCH_BOX =
+    public static final By STORE_NAME =
             AppiumBy.iOSNsPredicateString(
-                    "name BEGINSWITH 'Search ' AND name != 'Search designers, stores and pieces'"
-                            + " AND accessible == 1 AND visible == 1"
+                    "type == 'XCUIElementTypeStaticText' AND accessible == 1"
+                            + " AND rect.x > 30 AND rect.y BETWEEN {55, 85}"
             );
 
     /**

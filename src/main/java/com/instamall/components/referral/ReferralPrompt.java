@@ -46,7 +46,15 @@ public final class ReferralPrompt {
 
         tapScrim();
 
-        if (!WaitUtils.isVisible(ReferralPromptLocators.SHEET, Duration.ofSeconds(3))) {
+        // isInvisible() rather than !isVisible(): the scrim tap working is
+        // the common case, and isVisible(locator, timeout) only returns
+        // quickly when the element IS there — when it is already gone, it
+        // cannot say so before the full timeout elapses. isInvisible()
+        // returns the moment the sheet actually clears, and only spends
+        // the full 3s on the rare case this is actually meant to catch —
+        // the tap not registering. Same fix as CheckoutPage.placeOrder()'s
+        // own tap-settled check, same bug.
+        if (WaitUtils.isInvisible(ReferralPromptLocators.SHEET, Duration.ofSeconds(3))) {
 
             return true;
         }
@@ -54,7 +62,7 @@ public final class ReferralPrompt {
         System.out.println(">>> Referral sheet ignored the backdrop tap — swiping it down.");
         swipeSheetDown();
 
-        return !WaitUtils.isVisible(ReferralPromptLocators.SHEET, Duration.ofSeconds(3));
+        return WaitUtils.isInvisible(ReferralPromptLocators.SHEET, Duration.ofSeconds(3));
     }
 
     private static void tapScrim() {

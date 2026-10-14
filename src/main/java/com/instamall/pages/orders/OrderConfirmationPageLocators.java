@@ -8,7 +8,7 @@ import org.openqa.selenium.By;
  * dump.
  *
  * This screen shows only the total; the itemised charges are on the
- * checkout screen (see CheckoutPageLocators.ALL_CHARGE_AMOUNTS).
+ * checkout screen (see CheckoutPage.getCharges()).
  */
 public final class OrderConfirmationPageLocators {
 

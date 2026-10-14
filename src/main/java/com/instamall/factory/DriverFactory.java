@@ -79,6 +79,22 @@ public final class DriverFactory {
             // Reuse WebDriverAgent for faster session startup.
             options.setUseNewWDA(false);
 
+            // Never uninstall an app once it is on the simulator. Without
+            // this the XCUITest driver removes and reinstalls the app at
+            // the start of EVERY session that names an app path (checked
+            // in the driver's own install-state logic: app present +
+            // noReset unset = "install, do not skip uninstall"), wiping
+            // its data container — so each session opened on the login
+            // screen, re-asked every permission, and spent half a minute
+            // reinstalling. With noReset the first session installs the
+            // app (it is not there yet) and every later one keeps it as
+            // it is: the Shopper app stays signed in and on shift from
+            // Phase 2 into Phase 4, and the Customer app keeps its
+            // session from Phase 1 into Phase 5, with no alerts to answer
+            // again. Any dependency that needs a clean install is handled
+            // by uninstalling the app deliberately, never by the session.
+            options.setNoReset(true);
+
             // The first session on a freshly booted simulator has to build
             // and install WebDriverAgent for that runtime, which runs well
             // past the driver's one-minute default — seen on iOS 27.0,

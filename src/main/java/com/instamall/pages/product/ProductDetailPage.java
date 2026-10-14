@@ -3,13 +3,11 @@ package com.instamall.pages.product;
 import com.instamall.base.BasePage;
 import com.instamall.driver.DriverManager;
 import com.instamall.pages.bag.ShoppingBagPageLocators;
-import com.instamall.utils.CurrencyUtils;
 import com.instamall.waits.WaitUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,16 +28,6 @@ public class ProductDetailPage extends BasePage {
                 ProductDetailPageLocators.PRIMARY_ACTION_BUTTON, PRODUCT_LOAD_TIMEOUT);
 
         return this;
-    }
-
-    /**
-     * Headline price. The PDP prints it without decimals ("$750") while
-     * the bag prints "$750.00" — compare the parsed values, never the
-     * strings.
-     */
-    public BigDecimal getPrice() {
-
-        return CurrencyUtils.parse(getText(ProductDetailPageLocators.PRICE));
     }
 
     /**
@@ -249,7 +237,10 @@ public class ProductDetailPage extends BasePage {
      */
     public boolean addToBagIfNeeded() {
 
-        if (isDisplayed(ProductDetailPageLocators.VIEW_BAG)) {
+        // Asked without waiting: on the product page this pill is simply
+        // absent until the item is in the bag, so a waiting check burns
+        // its full timeout on every single product — 20s of nothing.
+        if (isDisplayedNow(ProductDetailPageLocators.VIEW_BAG)) {
 
             return false;
         }

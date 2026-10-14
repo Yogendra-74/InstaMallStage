@@ -29,14 +29,10 @@ public final class OrderDetailPageLocators {
                     "name == 'BACK' AND accessible == 1"
             );
 
-    /**
-     * Reads "Order number IM-XXXXX" — the id can be read off this same
-     * element rather than needing a separate locator per order.
-     */
-    public static final By ORDER_NUMBER_BUTTON =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Order number' AND accessible == 1"
-            );
+    // No locator for the "Order number IM-XXXXX" line on purpose: the
+    // Shopper app flows act on whichever order is first in the queue and
+    // never read, compare or carry the order id. The screen is recognised
+    // by its RUN PROGRESS header and its controls instead.
 
     public static final By STATUS_IN_PROGRESS =
             AppiumBy.iOSNsPredicateString(
@@ -190,40 +186,7 @@ public final class OrderDetailPageLocators {
                     "type == 'XCUIElementTypeStaticText' AND name == 'Got it' AND accessible == 1"
             );
 
-    /**
-     * The pencil beside the Per Unit Price value — confirmed live: a
-     * small, unnamed 16x16 element (iOS renders it an Other, not a
-     * Button). Tapping it turns the price from a plain StaticText into
-     * an editable XCUIElementTypeTextField in place; nothing else on
-     * this sheet shares that exact size, so geometry alone disambiguates
-     * it without needing an accessible name the app does not give it.
-     *
-     * Confirmed live, from InstaMall's own in-app notification copy,
-     * what editing this does: a lower price here credits the difference
-     * to the customer's InstaMall Wallet immediately (push notification:
-     * "The price of an item has decreased. The reduced amount will be
-     * credited to your InstaMall Wallet.") and the Confirm Payment sheet
-     * (ANY_CONFIRM_PAYMENT_BUTTON) reflects the new, lower total. A
-     * higher price was not confirmed live the same way (see
-     * ItemPriceIncreaseComplete's own doc comment for why) — per
-     * instruction, the opposite assumption (the customer is not charged
-     * more) is encoded the same way without that live confirmation.
-     */
-    public static final By PRICE_EDIT_ICON =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeOther' AND accessible == 1"
-                            + " AND rect.width == 16 AND rect.height == 16"
-            );
 
-    /**
-     * The Per Unit Price value once {@link #PRICE_EDIT_ICON} has turned
-     * it editable, e.g. "725.00" — reused for both reading the current
-     * price and overwriting it.
-     */
-    public static final By PRICE_EDIT_FIELD =
-            AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeTextField'"
-            );
 
     /**
      * The sheet's own confirm button — SAME accessible name as
@@ -266,21 +229,12 @@ public final class OrderDetailPageLocators {
             );
 
     /**
-     * "Confirm payment $&lt;total&gt;" — the button's accessible name
-     * embeds the live total, so build this fresh each time rather than
-     * caching it; the total is not known until this sheet is on screen.
-     */
-    public static By confirmPaymentButton(String amount) {
-
-        return AppiumBy.iOSNsPredicateString(
-                "name == 'Confirm payment $" + amount + "' AND accessible == 1"
-        );
-    }
-
-    /**
-     * Every candidate for the confirm-payment button, whatever amount it
-     * carries — for reading the live total off the screen before it is
-     * tapped, the same shape as CheckoutPageLocators.PLACE_ORDER_BUTTON.
+     * The confirm-payment button, whatever amount it carries. Matched on
+     * the fixed part of its name only: the live total follows it
+     * ("Confirm payment $1,345.64") and differs on every order, so a
+     * locator built around the amount breaks on the next run. Read the
+     * total off this button instead — see
+     * OrderDetailPage.getConfirmPaymentAmount().
      */
     public static final By ANY_CONFIRM_PAYMENT_BUTTON =
             AppiumBy.iOSNsPredicateString(
@@ -306,12 +260,49 @@ public final class OrderDetailPageLocators {
                     "name == 'Capture the receipt' AND accessible == 1"
             );
 
-    // ---------- Beyond receipt capture — NOT YET CAPTURED (blocked by the camera gap above) ----------
+    // ---------- Receipt capture on the Simulator — confirmed live, step by step ----------
     //
-    // Per the requested flow, still to be mapped once reachable (real
-    // device): "Keep" after the first image, a checkmark/tick to proceed,
-    // "Use photo" to submit the receipt, "Proceed" to process the order,
-    // "OK" to return home.
+    // With no camera the screen reads "Camera is not available on this
+    // device." and "Take photo" does nothing, but the staging build
+    // carries a bypass: "DEV · Sample receipt" swaps in a sample image
+    // and moves straight on to the "Looks good?" review screen, which
+    // offers RETAKE / USE PHOTO and a second bypass, "DEV · Upload
+    // receipt (skip confirm)".
+
+    public static final By DEV_SAMPLE_RECEIPT =
+            AppiumBy.iOSNsPredicateString(
+                    "name == 'DEV · Sample receipt' AND accessible == 1"
+            );
+
+    public static final By LOOKS_GOOD_TITLE =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeStaticText' AND name == 'Looks good?' AND accessible == 1"
+            );
+
+    public static final By USE_PHOTO_BUTTON =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeButton' AND name == 'USE PHOTO' AND accessible == 1"
+            );
+
+    // USE PHOTO opens "Submit receipt? / Upload this receipt to complete
+    // and process the order." with Proceed and Cancel — confirmed live.
+    public static final By SUBMIT_RECEIPT_TITLE =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeStaticText' AND name == 'Submit receipt?' AND accessible == 1"
+            );
+
+    public static final By SUBMIT_RECEIPT_PROCEED =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeOther' AND name == 'Proceed' AND accessible == 1"
+            );
+
+    // Proceed ends on "Order processed / Receipt uploaded and order
+    // submitted." with OK — the same title ORDER_PROCESSED_TITLE matches,
+    // but here the OK is an Other, not the Button that alert carries.
+    public static final By RECEIPT_PROCESSED_OK =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeOther' AND name == 'OK' AND accessible == 1"
+            );
 
     // ---------- "Start handoff?" sheet (opened by ShopperHomePage.tapStartHandoff()) ----------
 
@@ -354,6 +345,28 @@ public final class OrderDetailPageLocators {
     public static final By CAMERA_NOT_AVAILABLE_MESSAGE =
             AppiumBy.iOSNsPredicateString(
                     "name CONTAINS 'Camera is not available' AND accessible == 1"
+            );
+
+    /**
+     * The DEV bypass for that missing camera — the same shape
+     * {@link #DEV_SAMPLE_RECEIPT} gives the receipt capture, confirmed
+     * live: it swaps in a sample image, and the run goes on through
+     * "Looks good?" -&gt; {@link #USE_PHOTO_BUTTON} -&gt; "Complete
+     * handoff?" -&gt; Proceed -&gt; "Handoff complete" -&gt; OK.
+     */
+    public static final By DEV_SAMPLE_HANDOFF_PHOTO =
+            AppiumBy.iOSNsPredicateString(
+                    "name CONTAINS 'Sample handoff photo' AND accessible == 1"
+            );
+
+    public static final By COMPLETE_HANDOFF_PROCEED =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeOther' AND name == 'Proceed' AND accessible == 1"
+            );
+
+    public static final By HANDOFF_COMPLETE_OK =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeOther' AND name == 'OK' AND accessible == 1"
             );
 
 }

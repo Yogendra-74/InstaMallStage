@@ -39,9 +39,16 @@ public final class LoginPageLocators {
                     "type == 'XCUIElementTypeOther' AND name BEGINSWITH 'I agree that InstaMall' AND accessible == 1"
             );
 
+    /**
+     * The way on to the email sign-in screen. Confirmed live on the
+     * current build: a real Button reading "Continue with Email", one of
+     * four on the landing screen (Apple, Google, Email, "Show more
+     * options") under the phone-number field. An earlier build put a
+     * "Continue with email instead" StaticText here instead.
+     */
     public static final By CONTINUE_WITH_EMAIL =
-            AppiumBy.iOSClassChain(
-                    "**/XCUIElementTypeStaticText[`name == \"Continue with email instead\" AND accessible == true`]"
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeButton' AND name == 'Continue with Email' AND accessible == 1"
             );
 
     // The old "Go Back" link is gone; the header chevron is the way back.

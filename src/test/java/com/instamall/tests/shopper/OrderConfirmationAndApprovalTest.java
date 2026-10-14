@@ -91,8 +91,7 @@ public class OrderConfirmationAndApprovalTest extends ShopperBaseTest {
         homePage.openNewOrderCard();
 
         orderPage.waitForScreen();
-        String orderId = orderPage.getOrderId();
-        step("Order detail open: " + orderId);
+        step("Order detail open");
 
         Assert.assertTrue(orderValidator.isDisplayed(),
                 "Order detail screen did not open from the Home card");
@@ -149,9 +148,8 @@ public class OrderConfirmationAndApprovalTest extends ShopperBaseTest {
         Assert.assertTrue(orderValidator.isVirtualCardDisplayed(),
                 "The virtual card is not shown on the \"Confirm payment\" sheet");
 
-        String amount = orderPage.getConfirmPaymentAmount();
-        step("Confirm payment $" + amount);
-        orderPage.confirmPayment(amount);
+        step("Confirm payment");
+        orderPage.confirmPayment();
 
         // ---------- 8. Capture the receipt — reachability check only ----------
 

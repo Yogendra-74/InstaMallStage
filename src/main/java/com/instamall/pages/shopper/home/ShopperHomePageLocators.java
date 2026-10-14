@@ -78,6 +78,21 @@ public final class ShopperHomePageLocators {
             );
 
     /**
+     * The first listing while the shopper is ON SHIFT with a new order
+     * waiting. Confirmed live: one leaf Other with no children, named
+     * "NEW ORDER, DELIVERY, New order for, PAY WITH CARD, Duel, Burberry
+     * · Miami FL, $77.1, VIEW ORDER" — the "VIEW ORDER" button is fused
+     * into that name, not a separate element, so it is reached by the
+     * same bottom-biased tap as every other card CTA (see
+     * ShopperHomePage.tapCardCta()).
+     */
+    public static final By VIEW_ORDER_CARD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeOther' AND name CONTAINS 'VIEW ORDER'"
+                            + " AND accessible == 1"
+            );
+
+    /**
      * A card whose order is ready for the driver handoff — its CTA reads
      * "START HANDOFF". Kept separate from ANY_ACTIVE_ORDER_CARD rather
      * than folded into it: confirmed live that a "READY FOR HANDOFF" card
@@ -85,6 +100,19 @@ public final class ShopperHomePageLocators {
      * order further along than another), and the generic locator would
      * then match more than one card with no guaranteed order.
      */
+    /**
+     * The order's card once its receipt is submitted and before a driver
+     * is assigned on the Delivery Portal — confirmed live right after
+     * the "Order processed" OK: "WAITING FOR DRIVER, 21:47, DELIVERY,
+     * Awaiting driver for, PAY WITH CARD, Duel, Burberry · Miami FL,
+     * $77.1, WAITING FOR DRIVER, DRIVER ASSIGNED, PERSONAL SHOPPER".
+     */
+    public static final By WAITING_FOR_DRIVER_CARD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeOther' AND name CONTAINS 'WAITING FOR DRIVER'"
+                            + " AND accessible == 1"
+            );
+
     public static final By READY_FOR_HANDOFF_CARD =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeOther' AND name CONTAINS 'READY FOR HANDOFF'"
@@ -134,6 +162,26 @@ public final class ShopperHomePageLocators {
             AppiumBy.accessibilityId("Profile");
 
     // ---------- Shift status ----------
+
+    /**
+     * The shift badge itself. Its accessible name never changes with
+     * state ("View shift status options" whatever it displays), so this
+     * only ever identifies the badge — what it reads is sampled from its
+     * status dot in ShopperShift.readStatus().
+     */
+    public static final By SHIFT_STATUS_BADGE =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeButton' AND name == 'View shift status options'"
+                            + " AND accessible == 1"
+            );
+
+    /**
+     * Confirmed live against a real "On break" state: the same button
+     * name is used both on the options sheet the badge opens and on the
+     * "Resume shift?" confirmation that follows it.
+     */
+    public static final By RESUME_SHIFT_BUTTON =
+            AppiumBy.iOSNsPredicateString("name == 'Resume shift' AND accessible == 1");
 
     public static final By GO_ON_SHIFT_BUTTON =
             AppiumBy.iOSNsPredicateString(

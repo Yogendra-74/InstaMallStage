@@ -6,7 +6,7 @@ public class OrderDetailPageValidator extends BasePage {
 
     public boolean isDisplayed() {
 
-        return isDisplayed(OrderDetailPageLocators.ORDER_NUMBER_BUTTON);
+        return isDisplayed(OrderDetailPageLocators.RUN_PROGRESS_LABEL);
     }
 
     public boolean isStoreDisplayed(String brandUppercase) {
@@ -74,10 +74,6 @@ public class OrderDetailPageValidator extends BasePage {
         return isDisplayed(OrderDetailPageLocators.GOT_IT_SHEET_TITLE);
     }
 
-    public boolean isPriceEditIconDisplayed() {
-
-        return isDisplayed(OrderDetailPageLocators.PRICE_EDIT_ICON);
-    }
 
     public boolean isAcceptItemSheetDisplayed() {
 

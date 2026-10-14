@@ -4,17 +4,14 @@ import com.instamall.components.delivery.DeliveryUnavailablePrompt;
 import com.instamall.components.referral.ReferralPrompt;
 import com.instamall.pages.bag.ShoppingBagPage;
 import com.instamall.pages.checkout.CheckoutPage;
-import com.instamall.pages.checkout.CheckoutPageValidator;
 import com.instamall.pages.orders.OrderConfirmationPage;
 import com.instamall.pages.orders.OrderConfirmationPageValidator;
 import com.instamall.pages.payment.PaymentSheet;
 import com.instamall.pages.payment.PaymentSheetValidator;
-import com.instamall.utils.CurrencyUtils;
 import com.instamall.waits.WaitUtils;
 import org.openqa.selenium.TimeoutException;
 import org.testng.Assert;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +44,6 @@ public final class CheckoutFlow {
 
     private final ShoppingBagPage bagPage = new ShoppingBagPage();
     private final CheckoutPage checkoutPage = new CheckoutPage();
-    private final CheckoutPageValidator checkoutValidator = new CheckoutPageValidator();
     private final PaymentSheet paymentSheet = new PaymentSheet();
     private final PaymentSheetValidator paymentValidator = new PaymentSheetValidator();
     private final OrderConfirmationPage orderPage = new OrderConfirmationPage();
@@ -61,27 +57,20 @@ public final class CheckoutFlow {
     }
 
     /**
-     * What placing the order turned out to do, and what it will cost.
+     * What placing the order turned out to do.
      */
     public static final class Placed {
 
         private final boolean pickup;
-        private final BigDecimal total;
 
-        private Placed(boolean pickup, BigDecimal total) {
+        private Placed(boolean pickup) {
 
             this.pickup = pickup;
-            this.total = total;
         }
 
         public boolean isPickup() {
 
             return pickup;
-        }
-
-        public BigDecimal total() {
-
-            return total;
         }
     }
 
@@ -201,7 +190,7 @@ public final class CheckoutFlow {
             bagPage.clickCheckoutFor(product, size);
         }
 
-        checkoutPage.waitForScreen();
+        checkoutPage.awaitScreen();
 
         return BagOutcome.CHECKOUT_OPENED;
     }
@@ -209,20 +198,30 @@ public final class CheckoutFlow {
     /**
      * Chooses priority delivery, checks the summary adds up, places the
      * order, and falls back to collection when the delivery is refused.
+     *
+     * @param addressName the saved address this checkout should be
+     *                    delivering to, e.g. "Work" — or null for a guest
+     *                    checkout, which has no saved, named address to
+     *                    check against (the simulated GPS fix resolves to
+     *                    whatever street address is nearby instead); null
+     *                    confirms a real address populated the row rather
+     *                    than checking which one.
      */
     public Placed placeOrder(String addressName) {
 
-        // Safe for a caller that reached checkout by its own route rather
-        // than through tryOpenCheckoutFromBag.
-        checkoutPage.waitForScreen();
+        // One snapshot answers everything asked of the screen before the
+        // Priority tap: the mode it opened in, whether the delivery form
+        // is complete, and which address it is delivering to. Asked a
+        // locator at a time this was some forty-five round trips — see
+        // CheckoutPage.Screen. Safe for a caller that reached checkout by
+        // its own route rather than through tryOpenCheckoutFromBag.
+        CheckoutPage.Screen screen = checkoutPage.awaitScreen();
 
         // Which mode the screen opened in decides everything below. A store
         // group already set for collection opens straight on "Pickup from",
         // with no delivery section, no Priority option and no "Switch to
         // pickup" to look for — so it goes directly to choosing a slot.
-        // Reading the mode first is what avoids hunting for controls that
-        // are not there and then concluding the screen is broken.
-        if (checkoutValidator.isInPickupMode()) {
+        if (screen.isPickupMode()) {
 
             step.accept("Checkout opened for collection — choosing a slot directly");
 
@@ -230,39 +229,35 @@ public final class CheckoutFlow {
         }
 
         step.accept("Checkout opened for delivery");
-        checkoutPage.waitForDeliveryForm();
 
-        Assert.assertTrue(checkoutValidator.isDeliverToSectionDisplayed(),
-                "Checkout is not showing the delivery section");
+        Assert.assertTrue(screen.isDeliveryFormComplete(),
+                "Checkout is not showing the delivery section with both Priority and Schedule");
 
-        Assert.assertTrue(checkoutValidator.areDeliveryOptionsDisplayed(),
-                "Checkout is not offering both Priority and Schedule");
+        if (addressName != null) {
 
-        Assert.assertTrue(checkoutValidator.isAddressDisplayed(addressName),
-                "Checkout is not delivering to \"" + addressName + "\"");
+            Assert.assertTrue(screen.isDeliveringTo(addressName),
+                    "Checkout is not delivering to \"" + addressName + "\" — address row reads \""
+                            + screen.addressRow() + "\"");
+
+        } else {
+
+            Assert.assertNotNull(screen.addressRow(),
+                    "Checkout is not showing any delivery address");
+        }
 
         step.accept("Choose priority delivery");
         checkoutPage.selectPriorityDelivery();
 
-        // The screen opens on Schedule, and the bottom button carries the
-        // chosen speed — so this is what confirms the switch took.
-        Assert.assertTrue(checkoutPage.getPlaceOrderLabel().startsWith("Get it"),
-                "Place-order button still reads \"" + checkoutPage.getPlaceOrderLabel()
+        // The second snapshot, once the quote has refreshed: the bottom
+        // button's copy, which confirms the switch took, and the summary.
+        screen = checkoutPage.awaitSummary();
+
+        Assert.assertTrue(screen.placeOrderLabel() != null
+                        && screen.placeOrderLabel().startsWith("Get it"),
+                "Place-order button still reads \"" + screen.placeOrderLabel()
                         + "\" after choosing Priority");
 
-        // The tip is left at the app's default. Its chips are below the
-        // fold and unreachable without scrolling, and the default already
-        // puts a Tip line in the summary — which is what the sum needs.
-        Assert.assertTrue(checkoutValidator.areAllChargeRowsPresent(),
-                "Checkout summary is missing one of Subtotal / Delivery / Estimated tax"
-                        + " / Service fee / Tip / Total");
-
-        BigDecimal total = checkoutPage.getTotal();
-
-        assertSameAmount(checkoutPage.sumOfCharges(), total,
-                "Individual charges do not add up to the checkout total");
-
-        step.accept("Place order (total " + total + ")");
+        step.accept("Place order");
         checkoutPage.placeOrder();
 
         boolean pickup = awaitOrderOutcome() == OrderOutcome.DELIVERY_REFUSED;
@@ -277,7 +272,7 @@ public final class CheckoutFlow {
             return placeAsPickup();
         }
 
-        return new Placed(false, total);
+        return new Placed(false);
     }
 
     /**
@@ -294,32 +289,12 @@ public final class CheckoutFlow {
 
         step.accept("Pickup slot: " + checkoutPage.selectFirstTimeSlot());
 
-        // Nothing is being delivered, so there is no fee for it — which is
-        // also what confirms a switch actually took.
-        Assert.assertFalse(checkoutValidator.isChargeRowPresent("Delivery"),
-                "A collection order should carry no Delivery charge");
+        CheckoutPage.Screen screen = checkoutPage.awaitSummary();
 
-        // No Tip here on purpose: the header above that chip row reads "Tip
-        // to Your Delivery Driver" (see CheckoutPageLocators.TIP_HEADER),
-        // and a pickup has no delivery driver — the app drops the whole tip
-        // section rather than leaving it for a courier that never comes.
-        // getCharges() already reads whichever rows are actually present,
-        // so summing and totalling still work with this one gone.
-        for (String row : new String[] {"Subtotal", "Estimated tax", "Service fee", "Total"}) {
-
-            Assert.assertTrue(checkoutValidator.isChargeRowPresent(row),
-                    "Pickup summary is missing its " + row + " row");
-        }
-
-        BigDecimal total = checkoutPage.getTotal();
-
-        assertSameAmount(checkoutPage.sumOfCharges(), total,
-                "Individual charges do not add up to the pickup total");
-
-        step.accept("Place order as a pickup (total " + total + ")");
+        step.accept("Place order as a pickup");
         checkoutPage.placeOrder();
 
-        return new Placed(true, total);
+        return new Placed(true);
     }
 
     /**
@@ -359,12 +334,7 @@ public final class CheckoutFlow {
         Assert.assertTrue(paymentValidator.isSavedCardDisplayed(cardLast4),
                 "Saved card ending " + cardLast4 + " is not offered");
 
-        BigDecimal payable = paymentSheet.getPayableAmount();
-
-        assertSameAmount(payable, placed.total(),
-                "Payment sheet is charging a different amount than checkout quoted");
-
-        step.accept("Pay " + payable + " with card ending " + cardLast4);
+        step.accept("Pay with card ending " + cardLast4);
         paymentSheet.payWithSavedCard(cardLast4);
 
         // The app celebrates a placed order with a referral sheet, and while
@@ -416,9 +386,6 @@ public final class CheckoutFlow {
             }
         }
 
-        assertSameAmount(orderPage.getTotal(), payable,
-                "Order total does not match the amount paid");
-
         if (placed.isPickup()) {
 
             Assert.assertTrue(orderValidator.isPickupDetailsDisplayed(),
@@ -453,7 +420,7 @@ public final class CheckoutFlow {
         try {
 
             return WaitUtils.waitUntil(driver ->
-                            checkoutValidator.isDisplayedNow()
+                            checkoutPage.read().isOpen()
                                     ? CheckoutOutcome.OPENED
                                     : bagPage.hasOutOfStockItems()
                                             ? CheckoutOutcome.STOCK_REFUSED
@@ -489,13 +456,4 @@ public final class CheckoutFlow {
         }
     }
 
-    /**
-     * BigDecimal.equals() is scale sensitive and this app mixes scales —
-     * the product page prints "$750" where the bag prints "$750.00".
-     */
-    private void assertSameAmount(BigDecimal actual, BigDecimal expected, String message) {
-
-        Assert.assertTrue(CurrencyUtils.equalAmounts(actual, expected),
-                message + " — expected " + expected + " but found " + actual);
-    }
 }

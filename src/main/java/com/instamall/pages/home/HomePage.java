@@ -21,7 +21,11 @@ public class HomePage extends BasePage {
     public HomePage waitForScreen() {
 
         WaitUtils.waitForVisibility(HomePageLocators.TAB_HOME, FIRST_PAINT_TIMEOUT);
-        WaitUtils.waitForVisibility(HomePageLocators.SEARCH_INSTAMALL, FIRST_PAINT_TIMEOUT);
+
+        // Presence, not visibility: Home reopens wherever it was last
+        // scrolled to, and its header can then be above the viewport
+        // while still in the hierarchy.
+        WaitUtils.waitForPresence(HomePageLocators.HOME_HEADER, FIRST_PAINT_TIMEOUT);
 
         return this;
     }
@@ -85,24 +89,31 @@ public class HomePage extends BasePage {
         return this;
     }
 
-    public HomePage search(String query) {
-
-        type(HomePageLocators.SEARCH_INSTAMALL, query);
-
-        return this;
-    }
-
     /**
-     * Taps into the full Search screen (Malls / Stores / Products tabs) —
-     * see com.instamall.pages.search.SearchPage. A store cannot reliably
-     * be found by name without it: the "EXPLORE MALLS" mall cards on this
-     * screen open a mall landing page that was confirmed NOT to work as a
-     * per-mall store directory (always shows the same static "Your Local
-     * Edit" card regardless of which mall was tapped).
+     * Opens a mall's own store directory from its "EXPLORE MALLS" card,
+     * e.g. "Miami Design District" — confirmed live this opens a genuine
+     * per-mall directory (see com.instamall.pages.malls.MallDetailPage).
+     *
+     * "EXPLORE MALLS" is the last section on the feed, below the fold on
+     * a fresh load — click() alone timed out waiting for the card to
+     * become clickable, since WDA does not report an off-screen element
+     * as visible. Scrolled into view first, the same way a bag's
+     * Subtotal or a second store group's buttons already are.
+     *
+     * Waited for with the same long, network-bound timeout as
+     * listVisibleStoreCards() rather than WaitUtils' own 20s default:
+     * "EXPLORE MALLS" is the last section to render on a cold guest
+     * session, below "MIAMI'S FAVORITES" and "NEWEST TO INSTAMALL" —
+     * seen live to still be loading past 20s on a fresh sign-up, which
+     * read as the card never existing rather than just not yet.
      */
-    public HomePage openSearch() {
+    public HomePage openMallCard(String mallName) {
 
-        click(HomePageLocators.SEARCH_INSTAMALL);
+        WebElement card = WaitUtils.waitForPresence(HomePageLocators.mallCard(mallName), FIRST_PAINT_TIMEOUT);
+
+        scrollIntoView(card);
+
+        card.click();
 
         return this;
     }

@@ -1,6 +1,7 @@
 package com.instamall.pages.store;
 
 import com.instamall.base.BasePage;
+import com.instamall.components.permissions.SystemAlerts;
 import com.instamall.driver.DriverManager;
 import com.instamall.waits.WaitUtils;
 import org.openqa.selenium.WebElement;
@@ -14,34 +15,38 @@ public class StorePage extends BasePage {
     // The product grid loads over the network.
     private static final Duration CATALOG_TIMEOUT = Duration.ofSeconds(45);
 
-    public StorePage waitForScreen(String storeName) {
-
-        WaitUtils.waitForVisibility(
-                StorePageLocators.searchInStore(storeName), CATALOG_TIMEOUT);
-
-        return this;
-    }
-
     /**
      * Readiness gate for whichever store was opened, without needing to
      * know the brand up front.
+     *
+     * Polls for a stray permission alert while waiting, same discipline
+     * as HomePage's and MallDetailPage's own waits — a delayed location/
+     * notifications alert landing on this transition instead of an
+     * earlier one would otherwise sit unanswered for the whole timeout
+     * with nothing retrying it. A no-op everywhere this screen is
+     * already reached with every alert pre-granted or already drained.
      */
     public StorePage waitForScreen() {
 
-        WaitUtils.waitForVisibility(StorePageLocators.SEARCH_BOX, CATALOG_TIMEOUT);
+        WaitUtils.waitUntil(driver -> {
+
+            SystemAlerts.grantAnyShowingNow();
+
+            return WaitUtils.isVisibleNow(StorePageLocators.STORE_NAME)
+                    && WaitUtils.isVisibleNow(StorePageLocators.ANY_PRODUCT_TILE)
+                    ? Boolean.TRUE : null;
+
+        }, CATALOG_TIMEOUT);
 
         return this;
     }
 
     /**
-     * @return the brand this store page belongs to, read off the search
-     *         box ("Search Burberry" -> "Burberry").
+     * @return the brand this store page belongs to, read off the header.
      */
     public String getBrandName() {
 
-        String searchLabel = getText(StorePageLocators.SEARCH_BOX);
-
-        return searchLabel.replaceFirst("^Search\\s+", "").trim();
+        return getText(StorePageLocators.STORE_NAME).trim();
     }
 
     /**
@@ -78,13 +83,6 @@ public class StorePage extends BasePage {
         settle(StorePageLocators.productTile(tileName));
 
         click(StorePageLocators.productTile(tileName));
-
-        return this;
-    }
-
-    public StorePage searchInStore(String storeName, String query) {
-
-        type(StorePageLocators.searchInStore(storeName), query);
 
         return this;
     }

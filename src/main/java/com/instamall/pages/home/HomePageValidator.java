@@ -26,11 +26,6 @@ public class HomePageValidator extends BasePage {
         return isDisplayed(HomePageLocators.TAB_HOME, LANDING_TIMEOUT);
     }
 
-    public boolean isSearchBarDisplayed() {
-
-        return isDisplayed(HomePageLocators.SEARCH_INSTAMALL);
-    }
-
     public boolean isSectionDisplayed(String title) {
 
         return isDisplayed(HomePageLocators.sectionHeader(title));
