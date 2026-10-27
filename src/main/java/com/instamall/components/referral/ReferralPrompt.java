@@ -31,6 +31,18 @@ public final class ReferralPrompt {
     }
 
     /**
+     * On screen at this instant, with no waiting — for racing the sheet's
+     * arrival against the confirmation screen coming up. A plain
+     * {@link #isShowing()} here would sit out the full timeout on every run
+     * the sheet never appears on, which is exactly the delay the caller is
+     * racing to avoid (see WaitUtils#isVisibleNow).
+     */
+    public static boolean isShowingNow() {
+
+        return WaitUtils.isVisibleNow(ReferralPromptLocators.SHEET);
+    }
+
+    /**
      * Closes the sheet by tapping the backdrop, falling back to swiping it
      * down. The app offers no close control, so there is nothing more
      * direct to press.

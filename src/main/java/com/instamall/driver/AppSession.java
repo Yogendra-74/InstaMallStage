@@ -139,7 +139,7 @@ public final class AppSession {
 
     /**
      * Wipes the app's data container (keychain-backed auth tokens
-     * included) so the next launch starts at onboarding.
+     * included) so the next launch starts signed out.
      *
      * "mobile: clearApp" is not actually a data wipe on iOS — confirmed
      * against the simulator's own system log — it is a real uninstall
@@ -150,8 +150,9 @@ public final class AppSession {
      * notifications). A caller that immediately terminates/activates the
      * app the moment this method returns can land mid-reinstall, which
      * was seen live to corrupt the next launch — a black screen that
-     * eventually recovers onto onboarding rather than wherever the test
-     * actually left off, with nothing past that point ever appearing.
+     * eventually recovers onto the signed-out landing screen rather than
+     * wherever the test actually left off, with nothing past that point
+     * ever appearing.
      * Polling isAppInstalled() here, rather than trusting the call to
      * have finished when it returns, is what actually waits out that
      * window.

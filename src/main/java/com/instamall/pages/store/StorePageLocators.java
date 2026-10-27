@@ -74,6 +74,19 @@ public final class StorePageLocators {
     }
 
     /**
+     * The same tile addressed by name but WITHOUT the visibility filter, so
+     * it matches a tile still scrolled off screen. Used only to locate a
+     * below-the-fold tile and scroll it into view, after which the visible
+     * {@link #productTile} above is what is actually tapped.
+     */
+    public static By productTilePresent(String tileName) {
+
+        return AppiumBy.iOSNsPredicateString(
+                "name == '" + tileName + "' AND accessible == 1"
+        );
+    }
+
+    /**
      * Floating pill that replaces nothing and simply appears once the bag
      * has contents: "View bag (1)". It lives on this screen because the
      * app returns here after Add to bag.

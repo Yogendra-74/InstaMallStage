@@ -13,6 +13,16 @@ public class OrderConfirmationPageValidator extends BasePage {
         return isDisplayed(OrderConfirmationPageLocators.ORDER_ID, ORDER_CREATION_TIMEOUT);
     }
 
+    /**
+     * On screen at this instant, with no waiting — for racing the
+     * confirmation's arrival against the referral sheet that can cover it.
+     * See WaitUtils#isVisibleNow.
+     */
+    public boolean isDisplayedNow() {
+
+        return isDisplayedNow(OrderConfirmationPageLocators.ORDER_ID);
+    }
+
     public boolean isStatusInProgress() {
 
         return isDisplayed(OrderConfirmationPageLocators.STATUS_IN_PROGRESS);

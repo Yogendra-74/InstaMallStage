@@ -12,11 +12,11 @@ public class LoginPage extends BasePage {
     // The default 20s wait was confirmed live, repeatedly, to be too
     // short for this specific transition under current staging
     // conditions — this screen opens off a navigation, not a cold start,
-    // so it was never given the same longer allowance a first paint gets
-    // (see OnboardingPage's own FIRST_PAINT_TIMEOUT), but timed out here
-    // just the same even with the tap itself confirmed landing (pressAndRelease,
-    // no change in outcome). Matches the same order of magnitude as that
-    // first-paint allowance rather than inventing a new one.
+    // so it was never given the longer allowance a first paint gets, but
+    // timed out here just the same even with the tap itself confirmed
+    // landing (pressAndRelease, no change in outcome). Matches the same
+    // order of magnitude as a first-paint allowance rather than inventing
+    // a new one.
     private static final Duration SCREEN_READY_TIMEOUT = Duration.ofSeconds(45);
 
     /**
@@ -25,10 +25,9 @@ public class LoginPage extends BasePage {
      * so we only require presence for it.
      *
      * Polls for App Tracking Transparency while it waits — confirmed live,
-     * twice, that it can arrive right as this screen is opening (straight
-     * after OnboardingPage.clickLogin()) and sit there uncleared, the same
-     * shape BaseTest.awaitRelaunchFirstScreen()'s own comment describes for
-     * a fresh relaunch. Left unanswered it blocks this wait for its own
+     * twice, that it can arrive right as this screen is opening and sit
+     * there uncleared, the same shape BaseTest.awaitRelaunchFirstScreen()'s
+     * own comment describes for a fresh relaunch. Left unanswered it blocks this wait for its own
      * full timeout with no indication why.
      */
     public LoginPage waitForScreen() {
@@ -54,10 +53,9 @@ public class LoginPage extends BasePage {
                 WaitUtils.waitForPresence(LoginPageLocators.PHONE_NUMBER_TEXTBOX);
 
         // One digit per call. The masked input drops digits when a whole
-        // number arrives in a single sendKeys — that is an open app bug,
-        // tracked by reproPhoneFieldDropsDigitOnFastInput in LoginTest.
-        // Typing digit by digit is what a real user does anyway, so the
-        // other tests measure screen behaviour instead of failing on it.
+        // number arrives in a single sendKeys — an open app bug. Typing
+        // digit by digit is what a real user does anyway, so the tests
+        // measure screen behaviour instead of failing on it.
         for (char digit : phoneNumber.toCharArray()) {
 
             field.sendKeys(String.valueOf(digit));

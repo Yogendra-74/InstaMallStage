@@ -4,7 +4,6 @@ import com.instamall.driver.DriverManager;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Point;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriverException;
@@ -20,16 +19,9 @@ public final class WaitUtils {
 
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(20);
     private static final Duration SHORT_TIMEOUT = Duration.ofSeconds(3);
-    private static final Duration SETTLE_TIMEOUT = Duration.ofSeconds(5);
     /**
-     * Do not shorten this to speed the suite up. It is not only how often
-     * a wait looks, it is the baseline waitForStable measures movement
-     * against: that method calls an element settled when its position is
-     * unchanged between two consecutive polls. Sample 200ms apart instead
-     * of 500ms and the tail of an eased animation reads as stationary, so
-     * settle() returns mid-transition and the tap that follows is
-     * swallowed. Tried at 200ms; the onboarding Login button started
-     * missing.
+     * How often every wait looks. Do not shorten this to speed the suite
+     * up: tried at 200ms, and taps on animated buttons started missing.
      */
     private static final Duration POLLING_INTERVAL = Duration.ofMillis(500);
 
@@ -150,37 +142,9 @@ public final class WaitUtils {
         });
     }
 
-    // ---------- Stability (element stops moving; useful on animated screens) ----------
-
-    public static WebElement waitForStable(By locator) {
-
-        return waitForStable(locator, DEFAULT_TIMEOUT);
-    }
-
-    public static WebElement waitForStable(By locator, Duration timeout) {
-
-        final Point[] lastLocation = {null};
-
-        return newWait(timeout).until((ExpectedCondition<WebElement>) driver -> {
-
-            WebElement element = driver.findElement(locator);
-            Point currentLocation = element.getLocation();
-
-            if (currentLocation.equals(lastLocation[0]) && element.isDisplayed()) {
-
-                return element;
-            }
-
-            lastLocation[0] = currentLocation;
-
-            return null;
-        });
-    }
-
     /**
-     * Best-effort version of {@link #waitForStable(By)}: give the element
-     * a moment to stop moving, but fall back to plain clickability rather
-     * than failing.
+     * Waits for the element to be visible and clickable, without waiting
+     * for it to stop moving.
      *
      * Insisting on stability is too strict for screens the app keeps
      * animating — a floating ADD TO BAG button over a scrolling page never
@@ -192,31 +156,15 @@ public final class WaitUtils {
         // Acts the moment the element is visible and clickable, without
         // waiting for it to stop moving first. Every settle() call site in
         // the suite goes through here, so this is the one place that
-        // decides it and the one place to change it back.
+        // decides it.
         //
         // What it gives up: waiting for stability cost about two and a half
         // seconds per call, on five or six calls a run. What it risks: a
         // tap landing while a screen is still animating in gets swallowed,
-        // which is what happened to the onboarding Login button when the
+        // which is what happened to an animated entry button when the
         // poll interval was shortened. Store cards and the size sheet are
         // the other animated surfaces to watch.
         return waitForClickable(locator);
-    }
-
-    /**
-     * The stricter wait, still available for a caller that genuinely needs
-     * an element to have stopped moving before it is touched.
-     */
-    public static WebElement settleUntilStill(By locator) {
-
-        try {
-
-            return waitForStable(locator, SETTLE_TIMEOUT);
-
-        } catch (TimeoutException exception) {
-
-            return waitForClickable(locator);
-        }
     }
 
     // ---------- Arbitrary conditions ----------

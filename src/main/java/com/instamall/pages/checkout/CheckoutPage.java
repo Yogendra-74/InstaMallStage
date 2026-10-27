@@ -2,22 +2,15 @@ package com.instamall.pages.checkout;
 
 import com.instamall.base.BasePage;
 import com.instamall.driver.DriverManager;
-import com.instamall.utils.CurrencyUtils;
 import com.instamall.utils.ScreenSnapshot;
 import com.instamall.utils.ScreenSnapshot.Item;
 import com.instamall.waits.WaitUtils;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 public class CheckoutPage extends BasePage {
@@ -31,7 +24,7 @@ public class CheckoutPage extends BasePage {
     // How long the summary gets to finish painting: the quote refreshes
     // after a delivery speed is chosen, and a label can be on screen a
     // moment before its amount is.
-    private static final Duration CHARGES_SETTLE_TIMEOUT = Duration.ofSeconds(10);
+    private static final Duration QUOTE_REPAINT_TIMEOUT = Duration.ofSeconds(10);
 
     /**
      * Everything a caller asks of the checkout screen, read in one go.
@@ -61,7 +54,6 @@ public class CheckoutPage extends BasePage {
             this.deliveryFormComplete = deliveryFormComplete;
             this.addressRow = addressRow;
             this.placeOrderLabel = placeOrderLabel;
-            this.charges = Collections.unmodifiableMap(charges);
         }
 
         /**
@@ -117,12 +109,13 @@ public class CheckoutPage extends BasePage {
 
 
         /**
-         * Whether every charge label on screen had an amount on its
-         * line. False while the quote is still painting.
+         * The bottom button's copy, which follows the delivery speed —
+         * "Schedule Delivery" while Schedule is chosen, "Get it Today"
+         * once Priority is.
          */
-        boolean isChargesComplete() {
+        public String placeOrderLabel() {
 
-            return chargesComplete;
+            return placeOrderLabel;
         }
     }
 
@@ -185,32 +178,19 @@ public class CheckoutPage extends BasePage {
     }
 
     /**
-     * Waits for the summary to finish painting, then returns the screen
-     * with its charges.
-     *
-     * Past CHARGES_SETTLE_TIMEOUT whatever was last read is returned,
-     * and the caller's own checks say what is missing.
+     * Re-reads the screen once the quote has had a moment to repaint —
+     * what the caller needs after switching delivery speed, since the
+     * place-order button's copy changes with it.
      */
     public Screen awaitSummary() {
 
-        AtomicReference<Screen> lastRead = new AtomicReference<>();
+        return WaitUtils.waitUntil(driver -> {
 
-        try {
+            Screen screen = read();
 
-            return WaitUtils.waitUntil(driver -> {
+            return screen.placeOrderLabel() != null ? screen : null;
 
-                Screen screen = read();
-
-                lastRead.set(screen);
-
-                return screen.isChargesComplete() && !screen.charges().isEmpty() ? screen : null;
-
-            }, CHARGES_SETTLE_TIMEOUT);
-
-        } catch (TimeoutException stillIncomplete) {
-
-            return lastRead.get() != null ? lastRead.get() : read();
-        }
+        }, QUOTE_REPAINT_TIMEOUT);
     }
 
     /**
@@ -325,46 +305,6 @@ public class CheckoutPage extends BasePage {
     }
 
     // ---------- reading the summary ----------
-
-    /**
-     * Pairs each charge label with the amount on its line, top to bottom.
-     *
-     * Paired by line rather than taken as every amount on the screen:
-     * the store group prints "$14.99 delivery" and each item its price,
-     * and those would otherwise be summed in. The rows sit below the
-     * fold, so visibility is not required: the snapshot carries their
-     * names and frames either way.
-     *
-     * @return false if a label on screen had no amount on its line — the
-     *         summary is mid-render, and the read should be taken again
-     */
-    private static boolean readCharges(ScreenSnapshot screen, Map<String, BigDecimal> into) {
-
-        List<Item> labels = screen.where(item -> item.isStaticText()
-                && CheckoutPageLocators.CHARGE_ROW_LABELS.contains(item.name));
-
-        // "-$42.11" for a Rewards discount, "$16.00" for everything else.
-        List<Item> amounts = screen.where(item -> item.isStaticText()
-                && (item.nameStartsWith("$") || item.nameStartsWith("-$")));
-
-        labels.sort((first, second) -> Integer.compare(first.y, second.y));
-
-        for (Item label : labels) {
-
-            Optional<Item> amount = amounts.stream()
-                    .filter(candidate -> candidate.onSameLineAs(label))
-                    .findFirst();
-
-            if (amount.isEmpty()) {
-
-                return false;
-            }
-
-            into.put(label.name, CurrencyUtils.parse(amount.get().name));
-        }
-
-        return true;
-    }
 
     private static Predicate<Item> text(String exact) {
 

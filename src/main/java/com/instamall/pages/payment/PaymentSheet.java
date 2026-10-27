@@ -2,6 +2,7 @@ package com.instamall.pages.payment;
 
 import com.instamall.base.BasePage;
 import com.instamall.waits.WaitUtils;
+import org.openqa.selenium.By;
 
 import java.time.Duration;
 
@@ -16,10 +17,6 @@ public class PaymentSheet extends BasePage {
         return this;
     }
 
-    /**
-     * Final payable amount, read off the pay button ("Pay $962.49").
-     * This is the number the order confirmation must agree with.
-     */
     public PaymentSheet selectSavedCard(String lastFourDigits) {
 
         click(PaymentSheetLocators.savedCard(lastFourDigits));
@@ -40,11 +37,49 @@ public class PaymentSheet extends BasePage {
         return this;
     }
 
-    public PaymentSheet payWithSavedCard(String lastFourDigits) {
+    /**
+     * Pays, whichever state the sheet is in.
+     *
+     * Confirmed live, both ways round. With a card on the account the
+     * sheet shows it under "Saved" with an Edit pencil beside it, already
+     * selected — so there is nothing to fill in and the pay button is
+     * tapped straight away. With no card it opens on the card form
+     * instead, and the number, expiry and CVC have to be typed first.
+     * The Edit pencil is what tells the two apart.
+     */
+    public PaymentSheet payWith(String cardNumber, String expiry, String cvc) {
 
-        selectSavedCard(lastFourDigits);
+        if (isDisplayedNow(PaymentSheetLocators.EDIT_SAVED_CARD)) {
+
+            System.out.println(">>> A card is already saved — paying with it");
+
+        } else {
+
+            System.out.println(">>> No saved card — entering the test card");
+
+            typeCardDetail(PaymentSheetLocators.CARD_NUMBER_FIELD, cardNumber);
+            typeCardDetail(PaymentSheetLocators.CARD_EXPIRY_FIELD, expiry);
+            typeCardDetail(PaymentSheetLocators.CARD_CVC_FIELD, cvc);
+        }
 
         return pay();
+    }
+
+    /**
+     * One character at a time: a bulk sendKeys drops characters in these
+     * fields — confirmed live, "Automation addres" arriving as "Aation
+     * addres" on a field of the same kind — and the element is refetched
+     * between characters because the form re-renders as it formats what
+     * has been typed so far.
+     */
+    private void typeCardDetail(By field, String value) {
+
+        WaitUtils.waitForVisibility(field).click();
+
+        for (char character : value.toCharArray()) {
+
+            WaitUtils.waitForPresence(field).sendKeys(String.valueOf(character));
+        }
     }
 
     public PaymentSheet close() {

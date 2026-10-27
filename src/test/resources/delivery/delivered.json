@@ -1,0 +1,221 @@
+{
+    "event": "event.delivery_status",
+    "note": "delivered",
+    "status": "ORDER_DELIVERED",
+    "statusDescription": "Courier has completed the dropoff.",
+    "subStatus": null,
+    "receivedAt": "November 26th 2025, 9:23:14 am",
+    "trackingNumber": "del_yD09pJ4ARaW-mAnXJQbPKw",
+    "provider": "Uber",
+    "orderId": "69270bb7dfbdb47f3daca918",
+    "orderExternalId": "{{ORDER_NUMBER}}",
+    "tenantId": "instamall",
+    "statusUser": "Uber",
+    "driverExternalId": "",
+    "driverId": "",
+    "actualDeliveryTime": 1764166989956,
+    "actualPickupTime": 1764166813067,
+    "eventReason": null,
+    "storeExternalId": "68fb2f3b6f949bded68f64e1",
+    "attachments": [
+        {
+            "mimeType": "image/png",
+            "type": "signature",
+            "url": "https://production.files.deliverysolutions.co/instamall/delivery-attachments/Uber/signature/2025-11/del_yD09pJ4ARaW-mAnXJQbPKw-71f71c7e-cad3-11f0-9234-f51599ea0aef.png",
+            "task": "dropoff"
+        }
+    ],
+    "driver": {
+        "name": "EUMIR A.",
+        "phone": "+17867066480",
+        "photo": "https://d1w2poirtb3as9.cloudfront.net/b6cc216b-feb1-417b-97fb-497e6c72ee2f.jpeg?Expires=1764210159&Signature=yH6T2nyLkBfmR8VYRLRQT~stt6AqFwoKJ6kUFS~as87LwPkIS6xX6S~0Wg1gBCZ4MLrZ8bG1nFaftvHztE-prDRDYjSf7BLEaPPWefbqm1GBVzxewIjNJykdoLylRcqNsWWtb48kj-how25vpuWpnhcv5IbcdaWa3~cR-uaDOUEMhOqOk0pxsWVO2iJFY6H8bPvprX2MsBywMcRMujZQ-i6n2Rjw7XJZEURmwaGGZqK9QKriL9-4OsxfmxAf86K0qdEDUfVzOLHSq5OtYB6jGH-mN2K9CiQctexh3JJraZVXwUNG6e5OErXSmjzfACB4OzTSkUTptEbkhhxioPALtg__&Key-Pair-Id=K36LFL06Z5BT10",
+        "driverExternalId": "",
+        "driverId": "",
+        "orgUnit": ""
+    },
+    "vehicle": {
+        "type": "motorcycle",
+        "color": "green",
+        "number": "",
+        "vehicleExternalId": "Italika-Modena 150",
+        "vehicleId": ""
+    },
+    "lastLocation": {
+        "updatedAt": "2025-11-26T14:23:10.366Z",
+        "latitude": 25.799929,
+        "longitude": -80.195786
+    },
+    "amount": 549,
+    "trackingUrl": "https://delivery.uber.com/orders/c83d3da4-9e00-45a5-be98-09d72506cf2b",
+    "providerTrackingUrl": "https://delivery.uber.com/orders/c83d3da4-9e00-45a5-be98-09d72506cf2b",
+    "customerWebflowUrl": "",
+    "estimatedPickupTime": 1764166813089,
+    "estimatedPickupTimeByZone": "November 26th 2025, 9:22 am EST",
+    "estimatedPickupTimeStarts": null,
+    "estimatedPickupTimeEnds": 1764167785000,
+    "estimatedDeliveryTime": 1764166990089,
+    "estimatedDeliveryTimeEnds": 1764169100000,
+    "estimatedDeliveryTimeStarts": null,
+    "estimatedDeliveryTimeByZone": "November 26th 2025, 9:35 am EST",
+    "pickupInstructions": "",
+    "deliveryInstructions": null,
+    "deliveryContact": {
+        "name": "Yuval Segev",
+        "phone": "+17865301731",
+        "email": "instamalldev@gmail.com",
+        "notifySms": true
+    },
+    "deliveryAddress": {
+        "street": "38 NW 24th St",
+        "city": "Miami",
+        "state": "FL",
+        "zipcode": "33127",
+        "country": "US",
+        "latitude": 25.7997105,
+        "longitude": -80.19568919999999
+    },
+    "pickUpAddress": {
+        "street": "2058 NW Miami Ct",
+        "city": "Miami",
+        "state": "FL",
+        "zipcode": "33127",
+        "country": "US",
+        "latitude": 25.7965695,
+        "longitude": -80.19602739999999
+    },
+    "hostedTrackingUrl": "https://dl-s.co/clQtczOyasa",
+    "returnsUrl": "https://dl-s.co/sOcl1D0ho92",
+    "hostedFeedbackUrl": "https://dl-s.co/Qzd9mhAuxOI",
+    "providerBatch": {
+        "batchId": "rte_crYtKvR2T5C1eR9l2KAXuw"
+    },
+    "pickupCode": null,
+    "webhookType": "status",
+    "errors": [],
+    "dspAttributes": null,
+    "labelLink": "https://production.api.deliverysolutions.co/api/v3/label?tenantId=instamall&token={{json_web_token_1bqx}}",
+    "timeZone": "America/New_York",
+    "receivedAtEpoch": 1764166994883,
+    "preferredProvider": "",
+    "preferredService": "",
+    "orderAttributes": {},
+    "signatureImageUrl": null,
+    "currency": "cents",
+    "currencyCode": "USD",
+    "courier": null,
+    "labels": null,
+    "alternateLocation": null,
+    "type": "delivery",
+    "serviceType": "Delivery",
+    "isTipsPosted": true,
+    "tips": 10,
+    "fee": null,
+    "returnRequest": null,
+    "providerReturnResponse": null,
+    "proposedProviders": [],
+    "feedback": null,
+    "clonedFrom": null,
+    "groupId": "01KB08594MVY9CHGVDYVPN10MA",
+    "serviceId": "delivery",
+    "pickupTime": {
+        "startsAt": 1764166643810
+    },
+    "dropoffTime": {
+        "endsAt": 1764166703810
+    },
+    "barcodes": null,
+    "carrier": {
+        "provider": "Uber",
+        "trackingNumber": "del_yD09pJ4ARaW-mAnXJQbPKw",
+        "amount": 549,
+        "serviceId": "delivery",
+        "serviceName": null,
+        "status": "ORDER_DISPATCHED",
+        "providerInfo": {
+            "id": "68f208233b77ed9237c5d4c5",
+            "name": "Uber",
+            "displayName": "Uber",
+            "shipperNumber": ""
+        }
+    },
+    "isSelfHealed": false,
+    "batchId": "",
+    "batchSequence": "",
+    "itemList": [],
+    "signature": "required",
+    "shipments": [],
+    "createdAt": "2025-11-26T14:16:23.820Z",
+    "lastUpdatedAt": "2025-11-26T14:23:10.385Z",
+    "pickUpContact": {
+        "name": "Yuval",
+        "phone": "+13053082036",
+        "email": "yuval@instamall.co"
+    },
+    "brandExternalId": "instamall",
+    "orderValue": 137,
+    "packages": [
+        {
+            "name": "custom",
+            "size": {
+                "length": 10,
+                "width": 20,
+                "height": 5
+            },
+            "weight": 3.23,
+            "items": 1,
+            "temperatureControl": "none",
+            "barcode": null
+        }
+    ],
+    "isSpirit": false,
+    "isBeerOrWine": false,
+    "isTobacco": false,
+    "isFragile": false,
+    "isRx": false,
+    "hasRefrigeratedItems": false,
+    "hasPerishableItems": false,
+    "notifications": null,
+    "geofences": [
+        {
+            "name": "68fb2f3b6f949bded68f64e1-AtLocation",
+            "type": "at-location",
+            "lastUpdatedAt": "2025-11-26T14:16:55.778Z"
+        },
+        {
+            "name": "68fb2f3b6f949bded68f64e1-Nearby",
+            "type": "nearby",
+            "lastUpdatedAt": "2025-11-26T14:16:55.778Z"
+        }
+    ],
+    "undeliverableOrderReturnLocation": {
+        "address": {
+            "street": "2058 NW Miami Ct",
+            "city": "Miami",
+            "state": "FL",
+            "zipcode": "33127",
+            "country": "US",
+            "latitude": 25.7965695,
+            "longitude": -80.19602739999999
+        },
+        "contact": {
+            "name": "Yuval",
+            "phone": "+13053082036",
+            "email": "yuval@instamall.co"
+        },
+        "name": "Aroma 360",
+        "pickupInstructions": ""
+    },
+    "returnStoreId": "68fb2f3b6f949bded68f64e1",
+    "exceptionDetails": null,
+    "locale": null,
+    "addOns": [],
+    "insurance": null,
+    "deliveryDistance": 0.22,
+    "drivingDistance": 0.49,
+    "createdDate": null,
+    "taxIdentifiers": [],
+    "customsForms": [],
+    "isTracker": false,
+    "parentOrder": null,
+    "sentAt": "2025-11-26T14:23:14.883Z"
+}

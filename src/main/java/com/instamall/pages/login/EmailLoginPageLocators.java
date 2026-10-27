@@ -47,13 +47,10 @@ public final class EmailLoginPageLocators {
      * the app offers no Done key, WDA's hideKeyboard cannot dismiss it,
      * and while it is up it covers the consent box and Continue.
      *
-     * This same screen is reached from two different onboarding entry
-     * points — OnboardingPageLocators.LOGIN_BUTTON ("Already have an
-     * account? Sign in") and SIGNUP_BUTTON ("Make it personal") — and
-     * the headline reads differently depending on which one: "Your
-     * personal edit awaits." for sign-in, "Your personal edit starts
-     * here." for sign-up, confirmed live on each. Matched by the shared
-     * prefix rather than either exact string.
+     * The headline has read both "Your personal edit awaits." and "Your
+     * personal edit starts here.", depending on how the screen was
+     * reached. Matched by the shared prefix rather than either exact
+     * string.
      */
     public static final By HEADLINE =
             AppiumBy.iOSNsPredicateString(

@@ -18,11 +18,13 @@ public class ProfilePage extends BasePage {
 
     public ProfilePage waitForScreen() {
 
-        // Presence, not visibility: coming back to the tab keeps the list's
-        // scroll position, so "My profile" is often off the top of the
-        // screen while the screen itself is plainly Account.
+        // Presence, not visibility: coming back to the tab keeps the
+        // list's scroll position, so a row can sit off the top of the
+        // screen while the screen itself is plainly the profile. Keyed
+        // on the ORDERS stat, which is both always there and the thing
+        // this page is opened to tap.
         WaitUtils.waitForPresence(
-                ProfilePageLocators.MENU_MY_PROFILE, FIRST_PAINT_TIMEOUT);
+                ProfilePageLocators.STAT_ORDERS, FIRST_PAINT_TIMEOUT);
 
         return this;
     }
@@ -90,7 +92,7 @@ public class ProfilePage extends BasePage {
 
     /**
      * Ends the session. The caller owns the consequences — every test
-     * after this one meets the signed-out onboarding screen.
+     * after this one meets the signed-out sign-in landing screen.
      */
     public ProfilePage confirmLogout() {
 

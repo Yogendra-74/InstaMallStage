@@ -68,6 +68,13 @@ public class ShopperShift extends BasePage {
     // on, before it is read back.
     private static final long BADGE_SETTLE_MILLIS = 2000;
 
+    // When the shift is turned on by hand — the "Go on shift?" sheet,
+    // OFFLINE, or ON BREAK — the order the shopper is waiting for does not
+    // land on Home immediately; confirmed live at about 30s behind the
+    // turn-on. A shift that launched already ON SHIFT or IN ORDER has its
+    // order waiting already, so it gets no such wait.
+    private static final Duration ORDER_APPEARS_AFTER_MANUAL_SHIFT = Duration.ofSeconds(30);
+
     // The dot sits in the pill's left padding, somewhere in this band of
     // offsets from the badge's left edge. Scanned rather than sampled at
     // one fixed offset: the pill's width and padding follow its label,
@@ -86,12 +93,18 @@ public class ShopperShift extends BasePage {
      */
     public ShiftStatus ensureOnShift() {
 
+        // Whether this call actually flipped the shift on — the sheet,
+        // OFFLINE or ON BREAK — as opposed to finding it on already. Only a
+        // hand turn-on makes the order land 30s late (see the constant).
+        boolean turnedOnManually = false;
+
         if (WaitUtils.isVisible(ShopperHomePageLocators.GO_ON_SHIFT_BUTTON, CARD_APPEARS_WITHIN)) {
 
             // 1. The "Go on shift?" sheet is up — that is the whole job.
             System.out.println(">>> \"Go on shift?\" sheet is up — tapping \"Go on shift\"");
             click(ShopperHomePageLocators.GO_ON_SHIFT_BUTTON);
             settleBadge();
+            turnedOnManually = true;
 
         } else {
 
@@ -112,6 +125,7 @@ public class ShopperShift extends BasePage {
                 click(ShopperHomePageLocators.SHIFT_STATUS_BADGE);
                 click(ShopperHomePageLocators.GO_ON_SHIFT_BUTTON);
                 settleBadge();
+                turnedOnManually = true;
 
             } else {
 
@@ -124,6 +138,7 @@ public class ShopperShift extends BasePage {
                 click(ShopperHomePageLocators.RESUME_SHIFT_BUTTON);
                 click(ShopperHomePageLocators.RESUME_SHIFT_BUTTON);
                 settleBadge();
+                turnedOnManually = true;
             }
         }
 
@@ -136,6 +151,17 @@ public class ShopperShift extends BasePage {
         }
 
         System.out.println(">>> Shift confirmed " + settled.label());
+
+        // Only when the shift was just turned on by hand: the order is not
+        // on Home yet, so give it the ~30s it takes to arrive before the
+        // caller goes looking for its card.
+        if (turnedOnManually) {
+
+            System.out.println(">>> Shift turned on manually — waiting "
+                    + ORDER_APPEARS_AFTER_MANUAL_SHIFT.getSeconds()
+                    + "s for the order to appear on Home");
+            waitForManualShiftOrder();
+        }
 
         return settled;
     }
@@ -225,6 +251,18 @@ public class ShopperShift extends BasePage {
         try {
 
             Thread.sleep(BADGE_SETTLE_MILLIS);
+
+        } catch (InterruptedException interrupted) {
+
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private void waitForManualShiftOrder() {
+
+        try {
+
+            Thread.sleep(ORDER_APPEARS_AFTER_MANUAL_SHIFT.toMillis());
 
         } catch (InterruptedException interrupted) {
 

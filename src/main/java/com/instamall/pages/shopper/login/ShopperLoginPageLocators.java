@@ -4,8 +4,8 @@ import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.By;
 
 /**
- * The Shopper app's only opening screen — it has no onboarding step, unlike
- * the Customer app: a fresh launch goes straight to this login form.
+ * The Shopper app's only opening screen: a fresh launch goes straight to
+ * this login form.
  * Verified against a page source dump taken from the live screen.
  */
 public final class ShopperLoginPageLocators {

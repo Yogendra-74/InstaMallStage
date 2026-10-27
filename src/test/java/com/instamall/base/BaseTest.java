@@ -6,7 +6,7 @@ import com.instamall.driver.AppSession;
 import com.instamall.driver.DriverManager;
 import com.instamall.factory.DriverFactory;
 import com.instamall.pages.home.HomePageLocators;
-import com.instamall.pages.onboarding.OnboardingPageLocators;
+import com.instamall.pages.login.LoginPageLocators;
 import com.instamall.waits.WaitUtils;
 import io.appium.java_client.ios.IOSDriver;
 import org.openqa.selenium.TimeoutException;
@@ -109,12 +109,12 @@ public class BaseTest {
      *
      * The relaunch shows a splash for several seconds while the bundle
      * loads, longer than the framework's short glances. A test that opens
-     * with "is the Login button showing?" to decide whether to sign in
+     * with "is Continue with Email showing?" to decide whether to sign in
      * would answer no on the splash, skip signing in, and then wait for a
      * home screen that never comes. So this waits for whichever of the two
-     * opening screens arrives — onboarding when signed out, home when a
-     * session is active — and gives up quietly if neither does, leaving
-     * the test's own waits to say what went wrong.
+     * opening screens arrives — the sign-in landing screen when signed
+     * out, home when a session is active — and gives up quietly if
+     * neither does, leaving the test's own waits to say what went wrong.
      *
      * Overridable: this checks Customer-app locators, which mean nothing
      * to another app installed on the same simulator — see
@@ -122,8 +122,8 @@ public class BaseTest {
      *
      * Also grants any permission alert that shows up here — confirmed
      * live that App Tracking Transparency can arrive at this exact point
-     * (right after a fresh relaunch, before onboarding even paints) with
-     * nothing else in the Customer-app flow watching for it at this
+     * (right after a fresh relaunch, before the first screen even
+     * paints) with nothing else in the Customer-app flow watching for it at this
      * stage; left unanswered, it belongs to springboard, not the app, and
      * sits there through the rest of the run and its teardown, silently
      * blocking every element lookup after it. Harmless for the (most)
@@ -139,7 +139,7 @@ public class BaseTest {
 
                         SystemAlerts.grantAnyShowingNow();
 
-                        return WaitUtils.isVisibleNow(OnboardingPageLocators.LOGIN_BUTTON)
+                        return WaitUtils.isVisibleNow(LoginPageLocators.CONTINUE_WITH_EMAIL)
                                         || WaitUtils.isVisibleNow(HomePageLocators.TAB_HOME)
                                 ? Boolean.TRUE
                                 : null;
@@ -148,7 +148,7 @@ public class BaseTest {
 
         } catch (TimeoutException neitherAppeared) {
 
-            System.out.println(">>> Neither onboarding nor home showed within "
+            System.out.println(">>> Neither the sign-in landing screen nor home showed within "
                     + FIRST_SCREEN_TIMEOUT.toSeconds() + "s of relaunch — carrying on.");
         }
     }

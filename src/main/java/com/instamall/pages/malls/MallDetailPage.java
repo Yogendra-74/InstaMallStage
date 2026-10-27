@@ -55,4 +55,15 @@ public class MallDetailPage extends BasePage {
         return this;
     }
 
+    /**
+     * Taps the bag icon in the top-right corner of this screen's header,
+     * opening the shopping bag.
+     */
+    public MallDetailPage openBag() {
+
+        WaitUtils.waitForClickable(MallDetailPageLocators.BAG_ICON).click();
+
+        return this;
+    }
+
 }

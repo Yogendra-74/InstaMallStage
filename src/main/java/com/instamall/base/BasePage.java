@@ -71,11 +71,6 @@ public abstract class BasePage {
         return WaitUtils.waitForVisibility(locator);
     }
 
-    protected WebElement waitForStable(By locator) {
-
-        return WaitUtils.waitForStable(locator);
-    }
-
     /**
      * Acts as soon as the element is visible and clickable, without waiting
      * for it to stop moving. The default everywhere.
@@ -83,19 +78,6 @@ public abstract class BasePage {
     protected WebElement settle(By locator) {
 
         return WaitUtils.settle(locator);
-    }
-
-    /**
-     * Waits for the element to stop moving first.
-     *
-     * For the few surfaces that animate hard enough to swallow a tap taken
-     * the moment they appear — onboarding being the proven one, where the
-     * Login tap goes nowhere and the run then times out on the screen that
-     * never came.
-     */
-    protected WebElement settleUntilStill(By locator) {
-
-        return WaitUtils.settleUntilStill(locator);
     }
 
     protected boolean waitForInvisibility(By locator) {

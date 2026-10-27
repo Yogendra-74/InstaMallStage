@@ -10,6 +10,7 @@ import org.openqa.selenium.WebElement;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public class ShoppingBagPage extends BasePage {
@@ -105,6 +106,85 @@ public class ShoppingBagPage extends BasePage {
 
         return this;
     }
+
+    /**
+     * Waits for the bag to be open, by its title alone.
+     *
+     * Unlike {@link #waitForScreen()}, this does not wait for the
+     * "Review delivery &amp; checkout" button: a bag that holds items from
+     * more than one store opens with its store groups collapsed, and each
+     * group's checkout button is only rendered once that group is expanded
+     * (see {@link #expandStoreGroup(String)}).
+     */
+    public ShoppingBagPage waitForOpen() {
+
+        waitForVisibility(ShoppingBagPageLocators.TITLE);
+
+        return this;
+    }
+
+    /**
+     * Expands a store group by tapping its header, revealing that group's
+     * items and its own "Review delivery &amp; checkout" button.
+     */
+    public ShoppingBagPage expandStoreGroup(String storeName) {
+
+        click(ShoppingBagPageLocators.storeGroup(storeName));
+
+        return this;
+    }
+
+    /**
+     * Scrolls down until the "Review delivery &amp; checkout" button is on
+     * screen, then stops.
+     *
+     * Stops the moment the button shows, and also stops if a swipe moves
+     * nothing — the bottom has been reached — so it never keeps swiping at
+     * the end of a list it cannot scroll any further. Bounded regardless by
+     * {@link #MAX_SCROLL_SWIPES}.
+     */
+    public ShoppingBagPage scrollToCheckoutButton() {
+
+        for (int swipe = 0; swipe < MAX_SCROLL_SWIPES; swipe++) {
+
+            if (isDisplayedNow(ShoppingBagPageLocators.CHECKOUT_BUTTON)) {
+
+                return this;
+            }
+
+            String before = DriverManager.getDriver().getPageSource();
+
+            swipeUp();
+
+            if (DriverManager.getDriver().getPageSource().equals(before)) {
+
+                // Nothing moved — the bottom of the bag is reached.
+                break;
+            }
+        }
+
+        return this;
+    }
+
+    /**
+     * Taps the "Review delivery &amp; checkout" button.
+     */
+    public ShoppingBagPage clickReviewDeliveryAndCheckout() {
+
+        click(ShoppingBagPageLocators.CHECKOUT_BUTTON);
+
+        return this;
+    }
+
+    private void swipeUp() {
+
+        DriverManager.getDriver().executeScript("mobile: swipe", Map.of("direction", "up"));
+    }
+
+    // Enough swipes to reach the checkout button at the bottom of a bag
+    // several screens deep, with the no-movement check stopping earlier the
+    // moment the bottom is actually reached.
+    private static final int MAX_SCROLL_SWIPES = 12;
 
     /**
      * Whether one variant is in the bag.

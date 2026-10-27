@@ -101,7 +101,7 @@ public final class SystemAlerts {
      *
      * The one meant for a caller that has already been polling with
      * {@link #grantAnyShowingNow()} while waiting for the app's first
-     * screen to show (both app's onboarding waits do): by the time that
+     * screen to show (both apps' first-screen waits do): by the time that
      * loop exits, this alert — which shows at launch, within a second or
      * two of it or not at all — has very likely already been caught and
      * cleared there, which is exactly why this is a no-wait check rather

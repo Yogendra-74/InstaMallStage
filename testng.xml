@@ -11,10 +11,10 @@
         The full order lifecycle, one phase per test method, run in
         series in lifecycle order (priority 1..6) and stopping at the
         first failure: Customer app places an order, the Shopper app
-        accepts it through receipt submission, the Delivery Portal
-        assigns a driver and marks pickup, the Shopper app hands off,
-        the Portal dispatches through to Delivered, and the Customer app
-        confirms the order as Delivered. Runs first, against a clean
+        accepts it through receipt submission, Delivery Solutions
+        webhooks assign a driver and mark pickup, the Shopper app hands
+        off, more webhooks carry it through to Delivered, and the
+        Customer app confirms the order as Delivered. Runs first, against a clean
         simulator state. Any single phase can also be run on its own:
         mvn test -Dtest='Single_Order_Complete#phase2*'
     -->

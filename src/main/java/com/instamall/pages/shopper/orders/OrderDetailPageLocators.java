@@ -3,6 +3,8 @@ package com.instamall.pages.shopper.orders;
 import io.appium.java_client.AppiumBy;
 import org.openqa.selenium.By;
 
+import java.util.List;
+
 /**
  * The order-confirmation-and-approval journey, from the order detail
  * screen (opened via ShopperHomePage.openNewOrderCard()) through Got
@@ -132,6 +134,19 @@ public final class OrderDetailPageLocators {
     public static final String REASON_DAMAGED_OR_QUALITY_ISSUE = "Damaged / quality issue";
     public static final String REASON_WRONG_ITEM_IN_STORE_INVENTORY = "Wrong item in store inventory";
 
+    /**
+     * Every reason the sheet offers, in the order the app lists them —
+     * so a caller can pick one (e.g. at random) without restating the
+     * labels. Add to this list when the app adds a reason, and
+     * {@link #reasonOption(String)} resolves any of them to its row.
+     */
+    public static final List<String> ALL_REASONS = List.of(
+            REASON_OUT_OF_STOCK_SIZE,
+            REASON_OUT_OF_STOCK_COLOR,
+            REASON_OUT_OF_STOCK_ENTIRELY,
+            REASON_DAMAGED_OR_QUALITY_ISSUE,
+            REASON_WRONG_ITEM_IN_STORE_INVENTORY);
+
     public static By reasonOption(String reasonLabel) {
 
         return AppiumBy.iOSNsPredicateString(
@@ -174,9 +189,16 @@ public final class OrderDetailPageLocators {
                     "name == 'Order processed' AND accessible == 1"
             );
 
+    // The alert's OK, matched by name alone and NOT by element type.
+    // Confirmed live: on a single-item reject it renders as an
+    // XCUIElementTypeButton, but on an all-rejected multi-item order the
+    // same OK comes through as an XCUIElementTypeOther, so pinning the type
+    // (as this once did with 'XCUIElementTypeButton') times out on the
+    // multi-item case. The alert is modal, so "OK" is unambiguous on screen
+    // without the type.
     public static final By ORDER_PROCESSED_OK_BUTTON =
             AppiumBy.iOSNsPredicateString(
-                    "type == 'XCUIElementTypeButton' AND name == 'OK' AND accessible == 1"
+                    "name == 'OK' AND accessible == 1"
             );
 
     // ---------- "Got it" bottom sheet (opened by GOT_IT_BUTTON) ----------
@@ -197,6 +219,34 @@ public final class OrderDetailPageLocators {
     public static final By GOT_IT_SHEET_CONFIRM_BUTTON =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeOther' AND name == 'GOT IT' AND accessible == 1"
+            );
+
+    /**
+     * The pencil icon beside the "Per Unit Price" on the "Got it" sheet —
+     * tapping it opens the price field for editing (the keyboard comes up
+     * over the sheet). Confirmed live from a page source dump: it is a
+     * nameless, label-less 15x15 {@code XCUIElementTypeOther} sitting just
+     * to the right of the "$6,100.00" value, so there is no name to match
+     * on. It is anchored instead on the stable "Per Unit Price" label — the
+     * first {@code XCUIElementTypeOther} that follows it in document order —
+     * which is why this is an XPath rather than the predicate strings used
+     * elsewhere in this file.
+     */
+    public static final By EDIT_PER_UNIT_PRICE_PENCIL =
+            By.xpath("//XCUIElementTypeStaticText[@name='Per Unit Price']"
+                    + "/following::XCUIElementTypeOther[1]");
+
+    /**
+     * The editable Per Unit Price field — the pencil above swaps the
+     * static "$6,100.00" value for this {@code XCUIElementTypeTextField}
+     * (its {@code value} reads e.g. "6100.", with no currency symbol or
+     * thousands separators). Confirmed live from a page source dump to be
+     * the only text field on the sheet, which is how it is matched: it
+     * carries no name, label or placeholder.
+     */
+    public static final By EDIT_PER_UNIT_PRICE_FIELD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeTextField'"
             );
 
     // ---------- "Accept this item?" sheet ----------

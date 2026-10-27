@@ -78,7 +78,9 @@ public final class ProfilePageLocators {
 
     // ---------- Menu rows ----------
 
-    public static final By MENU_MY_PROFILE = menuRow("My profile");
+    // Named "Profile settings" on the current build, "My profile" on an
+    // earlier one.
+    public static final By MENU_PROFILE_SETTINGS = menuRow("Profile settings");
 
     public static final By MENU_MANAGE_ADDRESSES = menuRow("Manage addresses");
 

@@ -30,4 +30,13 @@ public class OrderConfirmationPage extends BasePage {
         return title.replaceFirst("(?i)^order:?\\s*", "").trim();
     }
 
+    /**
+     * Taps the order ID button to copy the complete order ID to the
+     * clipboard.
+     */
+    public void copyOrderId() {
+
+        click(OrderConfirmationPageLocators.ORDER_ID);
+    }
+
 }

@@ -48,7 +48,36 @@ public final class PaymentSheetLocators {
                     "type == 'XCUIElementTypeButton' AND value == '1'"
             );
 
-    // Name carries the payable amount: "Pay $962.49".
+    /**
+     * The pencil beside a saved card. Confirmed live: it is present only
+     * once a card is on the account, under a "Saved" heading beside the
+     * masked number — which makes it the tell for "there is a card here
+     * already, just pay" as against "no card, type one in".
+     */
+    public static final By EDIT_SAVED_CARD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeButton' AND name == 'Edit' AND accessible == 1"
+            );
+
+    // ---------- Entering a card, when none is saved ----------
+
+    public static final By CARD_NUMBER_FIELD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeTextField' AND name == 'Card number'"
+            );
+
+    public static final By CARD_EXPIRY_FIELD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeTextField' AND name == 'expiration date'"
+            );
+
+    public static final By CARD_CVC_FIELD =
+            AppiumBy.iOSNsPredicateString(
+                    "type == 'XCUIElementTypeTextField' AND name == 'CVC'"
+            );
+
+    // Name carries the payable amount, e.g. "Pay $962.49" — matched on
+    // the fixed part only, since the amount differs on every order.
     public static final By PAY_BUTTON =
             AppiumBy.iOSNsPredicateString(
                     "type == 'XCUIElementTypeButton' AND name BEGINSWITH 'Pay $'"

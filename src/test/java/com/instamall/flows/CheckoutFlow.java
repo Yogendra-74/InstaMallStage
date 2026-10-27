@@ -1,6 +1,6 @@
 package com.instamall.flows;
 
-import com.instamall.components.delivery.DeliveryUnavailablePrompt;
+import com.instamall.config.ConfigReader;
 import com.instamall.components.referral.ReferralPrompt;
 import com.instamall.pages.bag.ShoppingBagPage;
 import com.instamall.pages.checkout.CheckoutPage;
@@ -39,8 +39,24 @@ public final class CheckoutFlow {
     /** How long the payment sheet gets before the flow tries pickup. */
     private static final Duration PAYMENT_SHEET_APPEARS_WITHIN = Duration.ofSeconds(25);
 
+    /**
+     * How long, after paying, to watch for either the referral sheet or the
+     * order confirmation. Order creation is the slowest hop, so this matches
+     * the confirmation screen's own creation window.
+     */
+    private static final Duration REFERRAL_OR_CONFIRMATION_WITHIN = Duration.ofSeconds(90);
+
     /** How many times to clear unsellable lines and ask again. */
     private static final int CHECKOUT_RETRIES = 3;
+
+    /**
+     * How many times each of the checkout buttons — "Review delivery &
+     * checkout", "Get it Today" and "Pay" — is clicked before the order is
+     * taken as not placed and the test failed. The one retry covers a tap
+     * the app swallowed while a screen was still animating; a second miss
+     * fails, per instruction, with no fallback to pickup or anything else.
+     */
+    private static final int MAX_CLICK_ATTEMPTS = 2;
 
     private final ShoppingBagPage bagPage = new ShoppingBagPage();
     private final CheckoutPage checkoutPage = new CheckoutPage();
@@ -109,31 +125,53 @@ public final class CheckoutFlow {
     }
 
     /**
-     * Takes the bag through to the checkout screen.
+     * Opens the checkout screen by tapping the bag's "Review delivery &
+     * checkout" button.
      *
-     * Stock is settled here, not in the bag: tapping Checkout is what makes
-     * the app look, and a line it can no longer sell is marked only once
-     * that attempt has been refused. So there is nothing to find
-     * beforehand, however long the bag is watched — what the screen does
-     * instead is stay where it is, with the button still reporting itself
-     * enabled. The two outcomes are taken as a race, whatever the refusal
-     * named is deleted, and the question is asked again.
+     * Per instruction the button is tapped at most {@link #MAX_CLICK_ATTEMPTS}
+     * times: the one retry covers a tap the app swallowed while the screen
+     * was still animating, and if the checkout screen has still not opened
+     * after the second tap the test fails rather than trying anything else.
+     * Unsellable lines are no longer cleared and re-asked — see
+     * {@link #tryOpenCheckoutFromBag} for the stock-clearing form, which the
+     * product-hunting journeys still use.
      *
-     * @param product the item this run means to buy, which must survive
+     * @param product the item this run means to buy
      * @param size    its size, or the fixed size of a one-size product
-     * @return the unsellable lines deleted along the way
+     * @return an empty list — nothing is cleared here any more, kept only so
+     *         existing call sites need no change
      */
     public List<String> openCheckoutFromBag(String product, String size) {
 
-        List<String> cleared = new ArrayList<>();
+        clickToProceed("Review delivery & checkout",
+                () -> bagPage.clickCheckoutFor(product, size),
+                () -> checkoutPage.read().isOpen(),
+                CHECKOUT_OPENS_WITHIN,
+                "the checkout screen did not open");
 
-        BagOutcome outcome = tryOpenCheckoutFromBag(product, size, cleared);
+        checkoutPage.awaitScreen();
 
-        Assert.assertSame(outcome, BagOutcome.CHECKOUT_OPENED,
-                "\"" + product + "\" (" + size + ") is what the store could not sell,"
-                        + " so this run has nothing left to order");
+        return new ArrayList<>();
+    }
 
-        return cleared;
+    /**
+     * Opens the checkout screen by tapping a store group's already-expanded
+     * "Review delivery & checkout" button, with the same capped retry as
+     * {@link #openCheckoutFromBag}.
+     *
+     * For the multi-group journeys that expand the group and scroll the
+     * button on screen themselves, then hand the tap off here so it gets the
+     * same "tap up to {@link #MAX_CLICK_ATTEMPTS} times, else fail" handling.
+     */
+    public void reviewDeliveryAndCheckout() {
+
+        clickToProceed("Review delivery & checkout",
+                () -> bagPage.clickReviewDeliveryAndCheckout(),
+                () -> checkoutPage.read().isOpen(),
+                CHECKOUT_OPENS_WITHIN,
+                "the checkout screen did not open");
+
+        checkoutPage.awaitScreen();
     }
 
     /**
@@ -196,8 +234,14 @@ public final class CheckoutFlow {
     }
 
     /**
-     * Chooses priority delivery, checks the summary adds up, places the
-     * order, and falls back to collection when the delivery is refused.
+     * Chooses priority delivery, checks the summary adds up, and places the
+     * order by tapping "Get it Today".
+     *
+     * Per instruction the button is tapped at most {@link #MAX_CLICK_ATTEMPTS}
+     * times and the test fails if the payment sheet has not opened after the
+     * last tap — a refused delivery is no longer switched to pickup. (A store
+     * group that opens already in collection mode still places as a pickup,
+     * which is a different screen, not a fallback.)
      *
      * @param addressName the saved address this checkout should be
      *                    delivering to, e.g. "Work" — or null for a guest
@@ -257,20 +301,15 @@ public final class CheckoutFlow {
                 "Place-order button still reads \"" + screen.placeOrderLabel()
                         + "\" after choosing Priority");
 
-        step.accept("Place order");
-        checkoutPage.placeOrder();
-
-        boolean pickup = awaitOrderOutcome() == OrderOutcome.DELIVERY_REFUSED;
-
-        if (pickup) {
-
-            DeliveryUnavailablePrompt.waitUntilGone();
-
-            step.accept("Order did not go through as a delivery — switching to pickup");
-            checkoutPage.switchToPickup();
-
-            return placeAsPickup();
-        }
+        // Tap "Get it Today" up to MAX_CLICK_ATTEMPTS times, failing if the
+        // payment sheet has not come up after the last attempt. Per
+        // instruction a refused delivery is not switched to pickup — a
+        // missed placement just fails.
+        clickToProceed("Get it Today",
+                () -> checkoutPage.placeOrder(),
+                () -> paymentValidator.isDisplayedNow(),
+                PAYMENT_SHEET_APPEARS_WITHIN,
+                "the payment sheet did not open");
 
         return new Placed(false);
     }
@@ -289,7 +328,10 @@ public final class CheckoutFlow {
 
         step.accept("Pickup slot: " + checkoutPage.selectFirstTimeSlot());
 
-        CheckoutPage.Screen screen = checkoutPage.awaitSummary();
+        // Lets the pickup summary settle before the order is placed — a
+        // pickup carries no delivery fee, so the total the app shows here
+        // is not the delivery quote taken earlier.
+        checkoutPage.awaitSummary();
 
         step.accept("Place order as a pickup");
         checkoutPage.placeOrder();
@@ -331,15 +373,40 @@ public final class CheckoutFlow {
         Assert.assertTrue(paymentValidator.isTestModeBadgeDisplayed(),
                 "Payment sheet is not in TEST mode — refusing to pay with a live card");
 
-        Assert.assertTrue(paymentValidator.isSavedCardDisplayed(cardLast4),
-                "Saved card ending " + cardLast4 + " is not offered");
+        // No assertion that a card is already saved: the sheet handles
+        // both states, paying with the saved card when one is there and
+        // typing the test card in when it is not.
+        //
+        // Tap "Pay" up to MAX_CLICK_ATTEMPTS times. The card is entered on
+        // the first attempt (payWith); a second attempt, if the first did
+        // not take, only re-taps Pay, since the card is already in. The
+        // "order is coming up" signal is the referral sheet or the order
+        // confirmation — order creation is the slowest hop, so each attempt
+        // is given the full creation window before it counts as a miss,
+        // which also keeps a slow-but-successful charge from being paid a
+        // second time. If neither shows after the second tap, the order was
+        // not placed and the test fails.
+        step.accept("Pay");
+        paymentSheet.payWith(ConfigReader.get("testCardNumber"),
+                ConfigReader.get("testCardExpiry"),
+                ConfigReader.get("testCardCvc"));
 
-        step.accept("Pay with card ending " + cardLast4);
-        paymentSheet.payWithSavedCard(cardLast4);
+        if (!awaitCondition(this::orderIsComingUp, REFERRAL_OR_CONFIRMATION_WITHIN)) {
 
-        // The app celebrates a placed order with a referral sheet, and while
-        // that is up the confirmation behind it reports visible == false.
-        if (ReferralPrompt.dismissIfShowing()) {
+            step.accept("Pay (attempt 2 of " + MAX_CLICK_ATTEMPTS + ")");
+            paymentSheet.pay();
+
+            Assert.assertTrue(
+                    awaitCondition(this::orderIsComingUp, REFERRAL_OR_CONFIRMATION_WITHIN),
+                    "\"Pay\" was tapped " + MAX_CLICK_ATTEMPTS + " times but the order"
+                            + " confirmation never came up — the order was not placed");
+        }
+
+        // While the referral sheet is up the confirmation behind it reports
+        // visible == false, so clear it before reading the order. It does
+        // not always appear — isShowingNow() returns at once when it is
+        // absent, rather than sitting out a timeout.
+        if (ReferralPrompt.isShowingNow() && ReferralPrompt.dismissIfShowing()) {
 
             step.accept("Dismissed the referral sheet");
         }
@@ -404,7 +471,14 @@ public final class CheckoutFlow {
 
     private enum CheckoutOutcome { OPENED, STOCK_REFUSED }
 
-    private enum OrderOutcome { PAYMENT_SHEET, DELIVERY_REFUSED }
+    /**
+     * Whether the order is on its way up after "Pay" — the referral sheet
+     * the app throws over a fresh order, or the order confirmation itself.
+     */
+    private boolean orderIsComingUp() {
+
+        return ReferralPrompt.isShowingNow() || orderValidator.isDisplayedNow();
+    }
 
     /**
      * Watches for the checkout screen and the bag's refusal at once. A
@@ -433,26 +507,57 @@ public final class CheckoutFlow {
         }
     }
 
+    // ---------- clicking a checkout button, with a capped retry ----------
+
     /**
-     * Watches for the payment sheet and the delivery-refused toast at once,
-     * so a refusal is not learnt by sitting out the sheet's whole deadline
-     * — by which time the toast has cleared itself unseen.
+     * Clicks a checkout button up to {@link #MAX_CLICK_ATTEMPTS} times,
+     * stopping as soon as the step it drives has visibly taken, and failing
+     * the test when it has not after the last attempt. The one retry covers
+     * a tap the app swallowed while a screen was still animating; a second
+     * miss is taken as the order not going through, per instruction — there
+     * is no fallback.
+     *
+     * @param buttonName what to call the button in the log and the failure
+     * @param click      taps the button
+     * @param proceeded  true once the step the button drives has taken
+     * @param within     how long each attempt waits for {@code proceeded}
+     * @param failure    what did not happen, for the failure message
      */
-    private OrderOutcome awaitOrderOutcome() {
+    private void clickToProceed(String buttonName, Runnable click,
+                                java.util.function.BooleanSupplier proceeded,
+                                Duration within, String failure) {
+
+        for (int attempt = 1; attempt <= MAX_CLICK_ATTEMPTS; attempt++) {
+
+            step.accept(attempt == 1
+                    ? buttonName
+                    : buttonName + " (attempt " + attempt + " of " + MAX_CLICK_ATTEMPTS + ")");
+
+            click.run();
+
+            if (awaitCondition(proceeded, within)) {
+
+                return;
+            }
+        }
+
+        Assert.fail("\"" + buttonName + "\" was tapped " + MAX_CLICK_ATTEMPTS
+                + " times but " + failure + " — the order was not placed");
+    }
+
+    /**
+     * Waits up to {@code within} for a condition to hold, returning whether
+     * it did rather than throwing when it does not.
+     */
+    private boolean awaitCondition(java.util.function.BooleanSupplier condition, Duration within) {
 
         try {
 
-            return WaitUtils.waitUntil(driver ->
-                            paymentValidator.isDisplayedNow()
-                                    ? OrderOutcome.PAYMENT_SHEET
-                                    : DeliveryUnavailablePrompt.isShowingNow()
-                                            ? OrderOutcome.DELIVERY_REFUSED
-                                            : null,
-                    PAYMENT_SHEET_APPEARS_WITHIN);
+            return WaitUtils.waitUntil(driver -> condition.getAsBoolean() ? Boolean.TRUE : null, within);
 
-        } catch (TimeoutException neitherAppeared) {
+        } catch (TimeoutException neverHappened) {
 
-            return OrderOutcome.DELIVERY_REFUSED;
+            return false;
         }
     }
 

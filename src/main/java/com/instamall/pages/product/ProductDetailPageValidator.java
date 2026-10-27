@@ -30,8 +30,13 @@ public class ProductDetailPageValidator extends BasePage {
     // bag bar on products with a long title.
     public boolean isSizeCardDisplayed() {
 
-        return isPresent(ProductDetailPageLocators.SIZE_CARD)
-                || WaitUtils.isPresent(ProductDetailPageLocators.SIZE_CARD_LEGACY, Duration.ofSeconds(1));
+        // Either shape will do, and neither gets its own wait: the page
+        // is already up by the time this is asked, so a shape that is
+        // absent is absent now. Waiting on the full page's "Size"
+        // heading first cost three seconds on every product that uses
+        // the card shape instead, which is what this build does.
+        return WaitUtils.isVisibleNow(ProductDetailPageLocators.SIZE_CARD_LEGACY)
+                || WaitUtils.isVisibleNow(ProductDetailPageLocators.SIZE_CARD);
     }
 
     /**

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="model_02_rev Suite" verbose="1">
+
+    <listeners>
+        <listener class-name="com.instamall.listeners.TestListener"/>
+    </listeners>
+
+    <test name="Single_Item_Order">
+        <classes><class name="com.instamall.tests.model_02_rev.Single_Item_Order"/></classes>
+    </test>
+    <test name="Multiple_Item_Order">
+        <classes><class name="com.instamall.tests.model_02_rev.Multiple_Item_Order"/></classes>
+    </test>
+    <test name="Inc_Item_Price">
+        <classes><class name="com.instamall.tests.model_02_rev.Inc_Item_Price"/></classes>
+    </test>
+    <test name="Dec_Item_Price">
+        <classes><class name="com.instamall.tests.model_02_rev.Dec_Item_Price"/></classes>
+    </test>
+    <test name="Inc_Order_Partial">
+        <classes><class name="com.instamall.tests.model_02_rev.Inc_Order_Partial"/></classes>
+    </test>
+    <test name="Dec_Order_Partial">
+        <classes><class name="com.instamall.tests.model_02_rev.Dec_Order_Partial"/></classes>
+    </test>
+    <test name="Partial_Order_Found">
+        <classes><class name="com.instamall.tests.model_02_rev.Partial_Order_Found"/></classes>
+    </test>
+    <test name="Cancelled_Item">
+        <classes><class name="com.instamall.tests.model_02_rev.Cancelled_Item"/></classes>
+    </test>
+    <test name="Cancelled_Order">
+        <classes><class name="com.instamall.tests.model_02_rev.Cancelled_Order"/></classes>
+    </test>
+
+</suite>
