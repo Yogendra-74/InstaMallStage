@@ -19,8 +19,10 @@ import com.instamall.pages.login.LoginPage;
 import com.instamall.pages.login.LoginPageLocators;
 import com.instamall.pages.malls.MallDetailPage;
 import com.instamall.pages.orders.OrderConfirmationPage;
+import com.instamall.pages.orders.OrdersListPage;
 import com.instamall.pages.product.ProductDetailPage;
 import com.instamall.pages.product.ProductDetailPageValidator;
+import com.instamall.pages.profile.ProfilePage;
 import com.instamall.pages.shopper.home.ShopperHomePage;
 import com.instamall.pages.shopper.home.ShopperHomePageLocators;
 import com.instamall.pages.shopper.home.ShopperShift;
@@ -899,6 +901,96 @@ public class Cancelled_Item {
             }
 
             closeApp(driver, ConfigReader.get("shopperBundleId"), "Shopper");
+
+        } finally {
+
+            DriverManager.quitDriver();
+        }
+    }
+
+    // ==================== Phase 3: Customer app — verify the order reads Cancelled ====================
+
+    /**
+     * Reopens the Customer app and confirms the order Phase 1 placed now
+     * reads "Cancelled" in Account &gt; Orders — the customer-facing proof
+     * that rejecting the item in Phase 2 cancelled the order.
+     *
+     * This is the authoritative check, not the Shopper-side Home/History
+     * state Phase 2 ends on: it is scoped to this run's own order id, so a
+     * leftover order from another run cannot pass or fail it, which a
+     * global "No active orders." on the Shopper Home could.
+     *
+     * The Customer app is reused, not reinstalled: Phase 1 installed and
+     * signed it in, and every session runs with noReset, so it is still
+     * signed in here. The order is identified by the id Phase 1 placed
+     * (resolved through {@link PlacedOrder} so this phase can also be run
+     * on its own).
+     */
+    @Test(priority = 3, description = "Phase 3: Customer app — verify the order reads Cancelled in Account > Orders")
+    public void phase3_verifyOrderCancelledFromCustomerApp() {
+
+        orderId = PlacedOrder.resolve(orderId);
+
+        step("PHASE 3: Customer app — verify order " + PlacedOrder.describe(orderId) + " is Cancelled");
+
+        PlacedOrder.require(orderId, "Verifying the order is Cancelled in Account > Orders");
+
+        IOSDriver driver = DriverFactory.initializeDriver(false, ConfigReader.get("appPath"));
+        DriverManager.setDriver(driver);
+
+        try {
+
+            HomePage homePage = new HomePage();
+            HomePageValidator homeValidator = new HomePageValidator();
+            ProfilePage profilePage = new ProfilePage();
+            OrdersListPage ordersListPage = new OrdersListPage();
+
+            // The app reopens on whatever screen it was last on — walk it
+            // back to a screen with the tab bar, dismissing any system
+            // alert on the way, then assert Home actually showed.
+            boolean onHome = awaitUntil(() -> {
+
+                        SystemAlerts.grantAnyShowingNow();
+                        backOutTowardsHome();
+
+                        return homeValidator.isHomeTabDisplayedNow();
+
+                    }, APP_FIRST_SCREEN_WITHIN, "the Customer Home screen");
+
+            Assert.assertTrue(onHome,
+                    "The Customer app did not open on Home — was Phase 1 run on this simulator?");
+
+            step("Account > Orders");
+            homePage.openHomeTab().waitForScreen().openProfile();
+            profilePage.waitForScreen();
+            profilePage.openOrders();
+            ordersListPage.waitForScreen();
+
+            Assert.assertTrue(ordersListPage.isOrderListed(orderId),
+                    "Order " + orderId + " was not found in Account > Orders");
+
+            step("Found: " + ordersListPage.getOrderRowText(orderId));
+
+            // The order-level status for a rejected-item order reads
+            // "Cancelled" here — confirmed live against the "Your orders"
+            // list, where each row is "IM-XXXXX, Cancelled, $…".
+            step("Assert the order status reads \"Cancelled\"");
+            Assert.assertTrue(ordersListPage.hasStatus(orderId, "Cancelled"),
+                    "Order " + orderId + " is not Cancelled — Account > Orders shows \""
+                            + ordersListPage.getOrderRowText(orderId) + "\" instead");
+
+            step("SUCCESS: order " + orderId + " reads Cancelled in the Customer app");
+
+            try {
+
+                Thread.sleep(HOME_SETTLE_BEFORE_CLOSE_MILLIS);
+
+            } catch (InterruptedException interrupted) {
+
+                Thread.currentThread().interrupt();
+            }
+
+            closeApp(driver, ConfigReader.get("bundleId"), "Customer");
 
         } finally {
 

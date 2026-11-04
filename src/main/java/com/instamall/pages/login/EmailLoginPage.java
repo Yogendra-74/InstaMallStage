@@ -117,6 +117,62 @@ public class EmailLoginPage extends BasePage {
     }
 
     /**
+     * Returns to the phone sign-in landing screen. Confirmed in
+     * EmailLoginPageLocators: a "Continue with phone instead" StaticText
+     * sits below Continue on this screen.
+     */
+    public EmailLoginPage clickContinueWithPhone() {
+
+        click(EmailLoginPageLocators.CONTINUE_WITH_PHONE);
+
+        return this;
+    }
+
+    /**
+     * Whether Continue is enabled right now. It is an
+     * XCUIElementTypeOther that starts disabled and flips to enabled only
+     * once both fields hold text and the consent box is ticked — so the
+     * element is always in the tree and {@code isEnabled()} is the state
+     * worth reading, with no waiting that would hide a still-disabled
+     * button.
+     */
+    public boolean isContinueEnabled() {
+
+        return WaitUtils.waitForPresence(EmailLoginPageLocators.NEXT_BUTTON).isEnabled();
+    }
+
+    /**
+     * Whether the email sign-in screen is still the one on screen — the
+     * headline and the password field both still present. Used to confirm
+     * a rejected sign-in left the user here rather than moving on.
+     */
+    public boolean isScreenDisplayed() {
+
+        return WaitUtils.isVisibleNow(EmailLoginPageLocators.HEADLINE)
+                && WaitUtils.isPresent(EmailLoginPageLocators.PASSWORD_TEXTBOX);
+    }
+
+    /**
+     * Whether the backend's invalid-credentials error text is on screen.
+     */
+    public boolean isInvalidCredentialsErrorShown() {
+
+        return WaitUtils.isVisible(EmailLoginPageLocators.INVALID_CREDENTIALS_ERROR);
+    }
+
+    /**
+     * Whether the password-reset flow has opened after "Forgot
+     * password?". There is no page object for that screen yet, so this is
+     * read as the email sign-in screen having been left — its "Forgot
+     * password?" link is gone — rather than by matching unconfirmed reset
+     * screen text.
+     */
+    public boolean isPasswordResetOpen() {
+
+        return WaitUtils.waitForInvisibility(EmailLoginPageLocators.FORGOT_PASSWORD);
+    }
+
+    /**
      * Fills a field in one call, checks it landed, and only then falls
      * back to a character at a time.
      *
